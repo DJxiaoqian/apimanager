@@ -1,6 +1,36 @@
+$.fn.fill = function(data){
+    for(var key in data){
+        var $dom =$(this).find("[name='"+key+"']");
+        if(($dom[0] instanceof HTMLInputElement) || $dom[0] instanceof HTMLTextAreaElement || $dom[0] instanceof HTMLSelectElement){
+            if($dom[0].type != 'file'){
+                $dom.val(data[key]);
+            }
+        }
+    }
+};
+$.fn.reset= function(){
+    $(this).find(':input').each(
+        function(){
+            switch(this.type){
+                case 'passsword':
+                case 'select-multiple':
+                case 'select-one':
+                case 'text':
+                case 'textarea':
+                    $(this).val('');
+                    break;
+                case 'checkbox':
+                case 'radio':
+                    this.checked = false;
+            }
+        }
+    );
+};
+
 $(function(){
     $(document).click(function(){
         $(".ua-box").addClass("hide");
+        $(".modal").fadeOut();
     });
     $('.ua-box').click(function(e){
         e.stopPropagation();
@@ -17,5 +47,13 @@ $(function(){
             left:left,top:top
         }).removeClass("hide");
         return false;
+    });
+
+
+    $(".modal .modal-close").on("click",function(){
+        $(this).parents(".modal").fadeOut();
+    });
+    $(".modal .container").click(function(e){
+        e.stopPropagation();
     });
 });
