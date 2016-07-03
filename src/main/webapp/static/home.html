@@ -133,7 +133,7 @@
     </div>
 </section>
 
-<div class="modal" id="project-modal">
+<div class="modal-box modal" id="project-modal">
     <div class="container">
         <div class="head cb">
             <div class="fl">修改项目</div>
@@ -146,7 +146,7 @@
                     <div class="field-name">项目名称</div><div><input class="text" name="name" placeholder="团队名称" type="text"></div>
                 </div>
                 <div class="form-text">
-                    <div class="field-name">项目简介</div><div><textarea name="desc" class="text" placeholder="团队描述" id="" rows="5"></textarea></div>
+                    <div class="field-name">项目简介</div><div><textarea name="desc" class="text" placeholder="团队描述" rows="5"></textarea></div>
                 </div>
             </form>
         </div>
@@ -156,23 +156,71 @@
         </div>
     </div>
 </div>
-
-<div class="modal" id="team-modal">
+<div class="modal modal-layer"></div>
+<div class="modal modal-box" style="display: block" id="team-modal">
     <div class="container">
         <div class="head cb">
-            <div class="fl">修改团队</div>
+            <div class="fl">团队设置</div>
             <div class="fr"><i class="icon modal-close icon-close"></i></div>
         </div>
         <div class="content">
-            <form action="" id="team-form">
-                <input type="hidden" name="id">
+            <div class="g-tabs">
+                <div class="cb">
+                    <a href="#team-info" class="g-tab fl active">基本信息</a>
+                    <a href="#team-member" class="g-tab fl">团队成员</a>
+                    <a href="#team-setting" class="g-tab fl">团队设置</a>
+                </div>
+            </div>
+            <div class="g-tab-content" id="team-info">
+                <form action="" id="team-form">
+                    <input type="hidden" name="id">
+                    <div class="form-text">
+                        <div class="field-name">团队名称</div><div><input class="text" name="name" placeholder="团队名称" type="text"></div>
+                    </div>
+                    <div class="form-text">
+                        <div class="field-name">团队简介</div><div><textarea name="desc" class="text" placeholder="团队描述" id="" rows="5"></textarea></div>
+                    </div>
+                </form>
+            </div>
+            <div class="g-tab-content active" id="team-member">
                 <div class="form-text">
-                    <div class="field-name">团队名称</div><div><input class="text" name="name" placeholder="团队名称" type="text"></div>
+                    <div class="field-name">邀请成员</div>
+                    <div class="form-text"><input type="text" class="text" placeholder="联系人或邮箱地址"></div>
+                </div>
+                <div class="hp-team-members">
+                    <ul class="cb">
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                        <li>周靖杰<i>x</i></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="g-tab-content" id="team-setting">
+                <div class="form-text">
+                    <div class="field-name">转让团队</div>
+                    <div>
+                        <div><input class="text" name="name" placeholder="请输入被接收人邮箱" type="text"></div>
+                        <div><button class="btn btn-primary">转让</button></div>
+                    </div>
                 </div>
                 <div class="form-text">
-                    <div class="field-name">团队简介</div><div><textarea name="desc" class="text" placeholder="团队描述" id="" rows="5"></textarea></div>
+                    <div class="field-name">解散团队</div><div><button class="btn btn-danger">解散当前团队</button></div>
                 </div>
-            </form>
+            </div>
         </div>
         <div class="footer">
             <button class="btn btn-primary">确认</button>
@@ -187,7 +235,7 @@
 <script>
     //编辑
     $(".hp-atn-edit").click(function(e){
-        $("#project-modal").fadeIn();
+        $("#project-modal,.modal-layer").fadeIn();
         $("#project-form").fill(eval($(this).data("json")));
         e.stopPropagation();
     });
@@ -203,7 +251,7 @@
     });
     //双击
     $(".hp-tab:not(.hp-plus)").on("dblclick",function(){
-        $("#team-modal").fadeIn();
+        $("#team-modal,.modal-layer").fadeIn();
         e.stopPropagation();
     });
 </script>

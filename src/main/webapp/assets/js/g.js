@@ -51,9 +51,16 @@ $(function(){
 
 
     $(".modal .modal-close").on("click",function(){
-        $(this).parents(".modal").fadeOut();
+        $(".modal").fadeOut();
     });
     $(".modal .container").click(function(e){
         e.stopPropagation();
+    });
+     //tab
+    $(".g-tabs .g-tab").click(function(){
+         $(this).siblings(".g-tab").removeClass("active");
+         $(this).addClass("active");
+        $(".g-tab-content.active").removeClass("active");
+        $($(this).attr("href")).addClass("active");
     });
 });
