@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>小幺鸡API可视化管理系统</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1467704914_3060985.css">
+    <link href="../assets/umeditor/themes/default/css/umeditor.css" type="text/css" rel="stylesheet">
+    <!--<link rel="stylesheet" href="../assets/css/ali/iconfont.css">-->
     <link rel="dns-prefetch" href="http://cdn-img.easyicon.net">
     <link rel="dns-prefetch" href="http://download.easyicon.net">
     <meta name="keywords" content="" />
@@ -14,6 +17,7 @@
 <body class="api-body">
 <header>
     <div class="top">
+        <div class="lading" id="loading"></div>
         <div class="cb mc">
             <div class="user-action fr">
                 <a href="#login-box">登陆</a><a href="#register-box">注册</a>
@@ -50,7 +54,7 @@
             </ul>
         </nav>
         <div class="user-info fr">
-            <a href="" class="fl"><i class="icon icon-bell"></i> 消息</a>
+            <a href="" class="fl"><i class="iconfont icon-bell"></i> 消息</a>
             <div class="name fl">
                 <a href="">凉粉 <i class="icon icon-angle"></i></a>
                 <ul class="profile">
@@ -67,21 +71,178 @@
     <div class="api-sec1-desc ta-c">小幺鸡是一个可视化接口管理系统</div>
 </section>
 <div class="api-modules">
-    <div class="mc">
-        <ul class="cb">
-            <li class="api-module active">
-                <span>接口文档</span><i class="close">X</i>
+    <div class="mc cb">
+        <ul>
+            <li class="api-module fl active">
+                <span>接口文档</span><i class="icon-close iconfont"></i>
             </li>
-            <li class="api-module">
-                <span>接口文档</span><i class="close">X</i>
+            <li class="api-module fl">
+                <span>接口文档</span><i class="icon-close iconfont"></i>
             </li>
-            <li class="api-module">
-                <span>接口文档</span><i class="close">X</i>
+            <li class="api-module fl">
+                <span>接口文档</span><i class="icon-close iconfont"></i>
             </li>
-            <li class="api-module api-module-plus">+</li>
+            <li class="api-module fl api-new-module" contenteditable="true">请输入模块名称</li>
+            <li class="api-module fl api-module-plus"><i class="icon-tianjia iconfont"></i></li>
+            <li class="api-module fr api-export"><i class="icon-export iconfont"></i><span>导出</span></li>
+            <li class="api-module fr api-edit"><i class="icon-bianji iconfont"></i><span>编辑</span></li>
+            <li class="api-module fr api-cancel" onclick="location.reload()"><i class="icon-cancel iconfont"></i><span>取消</span></li>
+            <li class="api-module fr api-save"><i class="icon-save iconfont"></i><span>保存</span></li>
         </ul>
     </div>
 </div>
+
+
+<div id="api-edit-box" class="apis">
+    <div class="mc cb api-container">
+        <div class="fl apis-left">
+            <ul class="apis-nav">
+                <li>
+                    <div class="api-name api-description active" data-target="#api-doc-desc">
+                        <span>接口说明</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="api-name api-folder open"><span>用户管理</span><i class="icon-close iconfont"></i></div>
+                    <ul class="apis-nav apis-nav-sub">
+                        <li>
+                            <div class="api-name" data-json='{"name":"登陆","requestMethod":"PUT","responseType":"TEXT","description":"啊打发打发"}'><span>接口文档</span><i class="icon-close iconfont"></i> <i class="icon-bianji1 iconfont"></i></div>
+                        </li>
+                        <li>
+                            <div class="api-name"><span>接口文档</span><i class="icon-close iconfont"></i></div>
+                        </li>
+                        <li>
+                            <div class="api-name"><span>接口文档</span><i class="icon-close iconfont"></i></div>
+                        </li>
+                        <li>
+                            <div class="api-name"><span>接口文档</span><i class="icon-close iconfont"></i></div>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <div class="api-name"><span>接口文档</span><i class="icon-close iconfont"></i>
+                        <i class="iconfont icon-bianji1"></i>
+                    </div>
+                </li>
+                <li>
+                    <div class="api-name api-new"><i class="icon-tianjia iconfont"></i> 添加接口</div>
+                </li>
+            </ul>
+        </div>
+        <div class="api-content fl">
+            <div id="api-edit-description" class="api-doc-desc hide">
+                <div class="apis-module-name">接口说明</div>
+                <script type="text/plain" id="myEditor" style="width:900px;height:500px;"><p>在这里可以记录一些模块注意说明等</p></script>
+            </div>
+            <div id="api-edit-details">
+                <p class="api-details-title">基本信息</p>
+                <div class="api-base-info api-edit-box">
+                    <p>请求地址: <span>http://www.baidu.com</span></p>
+                    <p>请求方式: <span>GET</span></p>
+                    <p>响应类型: <span>JSON</span></p>
+                </div>
+
+                <p class="api-details-title">请求参数</p>
+                <script type="text/plain" id="requestArgTemplate">
+                    <tr>
+                            <td><i class="iconfont icon-close" onclick="$(this).parent().parent().remove()"></i>
+                                <i class="iconfont icon-tianjia" onclick='$(this).parent().parent().after($("#requestArgTemplate").html())'></i>
+                            </td>
+                            <td contenteditable="true"></td>
+                            <td>
+                                <select name="" class="select">
+                                    <option>true</option>
+                                    <option>false</option>
+                                </select>
+                            </td>
+                            <td contenteditable="true"></td>
+                            <td>
+                                <select name="" class="select">
+                                    <option>string</option>
+                                    <option>number</option>
+                                    <option>boolean</option>
+                                    <option>object</option>
+                                    <option>array[object]</option>
+                                    <option>array[string]</option>
+                                    <option>array[number]</option>
+                                    <option>array[boolean]</option>
+                                </select>
+                            </td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                </script>
+                <table class="table" cellpadding="0" cellspacing="0">
+                    <thead><tr>
+                        <th width="8%">操作</th>
+                        <th width="20%">参数名称</th>
+                        <th width="15%">是否必须</th>
+                        <th width="20%">默认值</th>
+                        <th width="15%">类型</th>
+                        <th>描述</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><i class="iconfont icon-close" onclick="$(this).parent().parent().remove()"></i>
+                                <i class="iconfont icon-tianjia" onclick='$(this).parent().parent().after($("#requestArgTemplate").html())'></i>
+                            </td>
+                            <td contenteditable="true"></td>
+                            <td>
+                                <select name="" class="select">
+                                    <option>true</option>
+                                    <option>false</option>
+                                </select>
+                            </td>
+                            <td contenteditable="true"></td>
+                            <td>
+                                <select name="" class="select">
+                                    <option>string</option>
+                                    <option>number</option>
+                                    <option>boolean</option>
+                                    <option>object</option>
+                                    <option>array[object]</option>
+                                    <option>array[string]</option>
+                                    <option>array[number]</option>
+                                    <option>array[boolean]</option>
+                                </select>
+                            </td>
+                            <td contenteditable="true"></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+                <p class="api-details-title">响应数据</p>
+                <table class="table" cellpadding="0" cellspacing="0">
+                    <thead><tr>
+                        <th class="edit-item" width="8%">操作</th>
+                        <th width="20%">参数名称</th>
+                        <th width="15%">类型</th>
+                        <th>描述</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><i class="iconfont icon-close"></i><i class="iconfont icon-tianjia"></i></td>
+                            <td contenteditable="true"></td>
+                            <td>
+                                <select name="" class="select">
+                                    <option>string</option>
+                                    <option>number</option>
+                                    <option>boolean</option>
+                                    <option>object</option>
+                                    <option>array[object]</option>
+                                    <option>array[string]</option>
+                                    <option>array[number]</option>
+                                    <option>array[boolean]</option>
+                                </select>
+                            </td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="api-view-box">
 <div class="apis">
     <div class="api-container mc cb">
     <div class="fl apis-left">
@@ -89,33 +250,36 @@
         <div style="height: 1px;background: #d6d6d6;margin-bottom: 10px;"></div>
         <ul class="apis-nav">
             <li>
-                <div class="api-name active"><span>接口文档</span><i class="close">X</i></div>
+                <div class="api-name api-description active" data-target="#api-doc-desc">
+                    <span>接口说明</span>
+                </div>
             </li>
-            <li >
-                <div class="api-name api-folder open"><span>接口文档</span><i class="close">X</i></div>
+            <li>
+                <div class="api-name api-folder open"><span>用户管理</span></div>
                 <ul class="apis-nav apis-nav-sub">
                     <li>
-                        <div class="api-name"><span>接口文档</span><i class="close">X</i></div>
+                        <div class="api-name" data-json='{"name":"登陆","requestMethod":"PUT","responseType":"TEXT","description":"啊打发打发"}'><span>接口文档</span></div>
+                    </li>
+                    <li><div class="api-name"><span>接口文档</span></div>
+                    </li>
+                    <li><div class="api-name"><span>接口文档</span></div>
                     </li>
                     <li>
-                        <div class="api-name"><span>接口文档</span><i class="close">X</i></div>
-                    </li>
-                    <li>
-                        <div class="api-name"><span>接口文档</span><i class="close">X</i></div>
-                    </li>
-                    <li>
-                        <div class="api-name"><span>接口文档</span><i class="close">X</i></div>
+                        <div class="api-name"><span>接口文档</span></div>
                     </li>
                 </ul>
             </li>
             <li>
-                <div class="api-name"><span>接口文档</span><i class="close">X</i></div>
+                <div class="api-name"><span>接口文档</span></div>
             </li>
             <li>
-                <div class="api-name"><span>接口文档</span><i class="close">X</i></div>
+                <div class="api-name"><span>接口文档</span></div>
             </li>
             <li>
-                <div class="api-name"><span>接口文档</span><i class="close">X</i></div>
+                <div class="api-name"><span>接口文档</span></div>
+            </li>
+            <li>
+                <div class="api-name"><span>接口文档</span></div>
             </li>
         </ul>
     </div>
@@ -124,7 +288,7 @@
                 <h3 class="apis-module-name fl">接口文档</h3>
                 <span class="api-update-time fr">更新时间: 2016/08/19 12:12:22</span>
             </div>
-            <div class="api-doc-desc hide">
+            <div id="api-doc-desc" class="api-doc-desc hide">
                 <p>
                     <br/>
                 </p>
@@ -171,10 +335,12 @@
                 </p>
             </div>
 
-            <div class="api-details">
-                <div class="api-details-desc">这是一段多文字,这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字</div>
+            <div id="api-details" class="api-details">
+                <div class="api-details-desc api-edit-box">
+                    <span class="content">这是一段多文字,这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字</span>
+                </div>
                 <p class="api-details-title">基本信息</p>
-                <div class="api-base-info">
+                <div class="api-base-info api-edit-box">
                     <p>请求地址: http://www.baidu.com</p>
                     <p>请求方式: GET</p>
                     <p>响应类型: JSON</p>
@@ -182,7 +348,6 @@
                 <p class="api-details-title">请求参数</p>
                 <table class="table" cellpadding="0" cellspacing="0">
                     <thead><tr>
-                        <th class="edit-item"></th>
                         <th width="20%">参数名称</th>
                         <th>是否必须</th>
                         <th>默认值</th>
@@ -191,40 +356,31 @@
                     </tr></thead>
                     <tbody>
                     <tr>
-                        <td class="edit-item"><i class="close">X</i></td>
-                        <td class="field-name">name</td>
+                        <td>name</td>
                         <td>true</td>
                         <td>true</td>
-                        <td>number</td>
+                        <td>object</td>
                         <td>名称</td>
-                    </tr>
-                    <tr>
-                        <td class="edit-item"><i class="close">X</i></td>
-                        <td class="field-name">password</td>
-                        <td>true</td>
-                        <td></td>
-                        <td>number</td>
-                        <td>密码密码密码</td>
                     </tr>
                     </tbody>
                 </table>
                 <p class="api-details-title">响应数据</p>
                 <table class="table" cellpadding="0" cellspacing="0">
                     <thead><tr>
-                        <th class="edit-item"></th>
+                        <th class="edit-item" width="5%">操作</th>
                         <th width="20%">参数名称</th>
                         <th>类型</th>
                         <th>描述</th>
                     </tr></thead>
                     <tbody>
                     <tr>
-                        <td class="edit-item"><i class="close">X</i></td>
+                        <td class="edit-item"><i class="iconfont icon-close"></i><i class="iconfont icon-tianjia"></i></td>
                         <td class="field-name">name</td>
                         <td>string</td>
                         <td>名称</td>
                     </tr>
                     <tr>
-                        <td class="edit-item"><i class="close">X</i></td>
+                        <td class="edit-item"><i class="iconfont icon-close"></i><i class="iconfont icon-tianjia"></i></td>
                         <td class="field-name">password</td>
                         <td>string</td>
                         <td>密码密码密码</td>
@@ -247,7 +403,7 @@
                         <div class="text-field-name fl">name</div>
                         <div class="text-value fl"><input type="text" class="text"></div>
                     </div>
-                    <div class="form-text cb">
+                    <div class="form-text cb" >
                         <div class="text-field-name fl"></div>
                         <div class="text-value fl"><input type="button" class="btn btn-primary" value="提交"></div>
                     </div>
@@ -256,48 +412,62 @@
         </div>
     </div>
 </div>
-<div class="modal modal-layer"></div>
-<div class="modal-box modal" id="api-call-result">
+<div class="modal modal-layer" ></div>
+<div class="modal-box modal" id="api-add-modal">
     <div class="container">
         <div class="head cb">
-            <div class="fl">返回结果</div>
-            <div class="fr"><i class="icon modal-close icon-close"></i></div>
+            <div class="fl">添加接口</div>
+            <div class="fr"><i class="iconfont modal-close icon-close"></i></div>
         </div>
         <div class="content">
-            <pre>
-                adafadsf
-                afdaf
-                afdadf
-                dafad
-                fadf
-                ad
-                fa
-                df
-                ad
-                fa
-                d
-                fa
-                df
-                ad
-                f
-                ad
-                fa
-
-            </pre>
+            <form action="">
+                <input type="hidden" name="id">
+                <div class="form-text">
+                    <div class="field-name">接口名称</div><div><input class="text" name="name" placeholder="团队名称" type="text"></div>
+                </div>
+                <div class="form-text">
+                    <div class="field-name">请求方式</div><div>
+                    <select class="select" name="requestMethod">
+                        <option>GET</option>
+                        <option>POST</option>
+                        <option>PUT</option>
+                        <option>PATCH</option>
+                        <option>DELETE</option>
+                        <option>HEAD</option>
+                        <option>OPTIONS</option>
+                    </select>
+                </div>
+                </div>
+                <div class="form-text">
+                    <div class="field-name">响应类型</div>
+                    <div>
+                    <select class="select" name="responseType">
+                        <option>JSON</option>
+                        <option>TEXT</option>
+                        <option>XML</option>
+                    </select></div>
+                </div>
+                <div class="form-text">
+                    <div class="field-name">接口说明</div><div><textarea name="description" class="text" placeholder="接口描述" rows="5"></textarea></div>
+                </div>
+            </form>
+        </div>
+        <div class="footer">
+            <button class="btn btn-primary">确认</button>
+            <button class="btn btn-gray modal-close">取消</button>
         </div>
     </div>
 </div>
-
+</div>
+<script src="../assets/js/api.js"></script>
+<script type="text/javascript" charset="utf-8" src="../assets/umeditor/umeditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="../assets/umeditor/umeditor.min.js"></script>
+<script type="text/javascript" src="../assets/umeditor/lang/zh-cn/zh-cn.js"></script>
 <footer class="ta-c">
     小幺鸡@2016
 </footer>
 <script>
-    $(function(){
-        $(".api-folder").click(function(){
-            $(this).toggleClass("open");
-            $(this).next().slideToggle();
-        });
-    });
+    var um = UM.getEditor('myEditor');
 </script>
 </body>
 </html>
