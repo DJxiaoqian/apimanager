@@ -69,9 +69,11 @@ input,textarea{
     padding: 4px 8px;
     box-sizing: border-box;
     outline: none;
+    -webkit-appearance: none;
+     -webkit-border-radius: 0px;
 }
 .btn{
-    padding: 6px 15px;
+    padding: 5px 8px;
     border: none;
     background: #eeeeee;
     cursor: pointer;
@@ -114,7 +116,7 @@ footer{
     height: 100%;
     left: 0;
     top: 0;
-    z-index: 9;
+    z-index: 1000;
 }
 .modal-box{
     position: fixed;
@@ -122,7 +124,7 @@ footer{
     height: 100%;
     left: 0;
     top: 0;
-    z-index: 10;
+    z-index: 1001;
     overflow-x: hidden;
     overflow-y: auto;
 }
@@ -550,7 +552,7 @@ section{
     padding: 5px 0 5px 20px;
     cursor: pointer;
 }
-.apis-nav .api-name.api-new{
+.apis-nav .api-name.api-folder-new{
     background: #e0e0e0;
     margin-top: 20px;
 }
@@ -562,13 +564,18 @@ section{
     border-left:2px solid #0089cd;
 }
 .apis-nav .api-name.api-folder{
-    background: url("http://img.alicdn.com/tps/i4/TB1sLIsGXXXXXb6XFXX1aiKJFXX-4-7.png") 8px 15px no-repeat;
+    background: url("http://img.alicdn.com/tps/i4/TB1sLIsGXXXXXb6XFXX1aiKJFXX-4-7.png") 8px 12px no-repeat;
 }
 .apis-nav .api-name.api-folder.open{
     background-image: url("http://img.alicdn.com/tps/i3/TB1vn3AGXXXXXbFXXXXWXbjJFXX-7-4.png");
 }
 .apis-nav .api-name i{
     margin-left: 8px;
+}
+.apis-nav .api-folder span{
+    display: inline-block;
+    min-width: 20px;
+    min-height: 20px;
 }
 .apis-nav-sub{
 }
@@ -615,7 +622,11 @@ section{
 .api-content .table td{
     border-bottom: 1px solid #e0e0e0;
     border-left: 1px solid #e0e0e0;
-    padding: 10px;
+    padding: 4px 10px;
+    outline: none;
+}
+.api-content .table td:focus{
+    border:1px solid #0089cd;
 }
 .api-content .table td.field-name{
     color:#d45454;
@@ -647,3 +658,48 @@ section{
 #api-edit-box{
     width: 100%;
 }
+#api-edit-box .apis-nav .api-name.api-folder.open{
+    background: none;
+    padding-left: 0;
+}
+#api-edit-box .apis-nav .api-name.api-folder{
+    background: none;   
+    padding-left: 0;
+}
+#api-edit-box .apis-nav .api-name i{
+    margin-left: 0;
+}
+.api-add-sub{
+    display: none
+}
+.api-tr-row-2 td{
+    background: #f3f3fb!important;
+}
+.api-tr-row-3 td{
+    background: #f0f0ff!important;
+}
+.api-tr-row-4 td{
+    background: #e7e7ff!important;
+}
+.api-tr-row-5 td{
+    background:#d7d7de!important;
+}
+.api-tr-row-6 td{
+    background:#d5d5de!important;
+}
+.api-tr-row-7 td{
+    background:#c8c8dc!important;
+}
+.api-tr-row-8 td{
+    background:#d4dac3!important;
+}
+.api-tr-row-9 td{
+    background:#efdddb!important;
+}
+
+
+
+
+
+
+

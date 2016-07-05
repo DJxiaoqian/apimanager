@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>小幺鸡API可视化管理系统</title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="//at.alicdn.com/t/font_1467704914_3060985.css">
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1467729261_0034997.css">
     <link href="../assets/umeditor/themes/default/css/umeditor.css" type="text/css" rel="stylesheet">
     <!--<link rel="stylesheet" href="../assets/css/ali/iconfont.css">-->
     <link rel="dns-prefetch" href="http://cdn-img.easyicon.net">
@@ -68,7 +68,7 @@
     </div>
 </header>
 <section class="api-sec1">
-    <div class="api-sec1-desc ta-c">小幺鸡是一个可视化接口管理系统</div>
+    <div class="api-sec1-desc ta-c">APIDOC是一个可视化接口管理系统</div>
 </section>
 <div class="api-modules">
     <div class="mc cb">
@@ -96,36 +96,35 @@
 <div id="api-edit-box" class="apis">
     <div class="mc cb api-container">
         <div class="fl apis-left">
+            <script type="text/plain" id="api-folder-template">
+                <li>
+                    <div class="api-name api-folder open">
+                        <i onclick="folderToggleSlide(this)" class="icon-angeldownblock iconfont"></i>   
+                        <span contenteditable="true">文件夹名称</span>
+                        <i onclick="apiDelete(this)" class="icon-close iconfont"></i>
+                        <i onclick="apiEdit(this)" class="icon-bianji iconfont api-new"></i>
+                        <i onclick="newApi(this)" class="icon-tianjia iconfont api-new"></i>
+                    </div>
+                    <ul class="apis-nav apis-nav-sub"></ul>
+                </li>
+            </script>
+            <script type="text/plain" id="api-item-template">
+                <li>
+                    <div class="api-name" data-json='{{json}}'>
+                    <span onclick="turnRight(this)">{{name}}</span>
+                        <i onclick="apiDelete(this)" class="icon-close iconfont"></i>
+                        <i onclick="apiEdit(this)" class="icon-bianji iconfont api-new"></i>
+                    </div>
+                </li>
+            </script>
             <ul class="apis-nav">
                 <li>
-                    <div class="api-name api-description active" data-target="#api-doc-desc">
+                    <div class="api-name api-description active" onclick="turnRightDoc(this)">
                         <span>接口说明</span>
                     </div>
                 </li>
-                <li>
-                    <div class="api-name api-folder open"><span>用户管理</span><i class="icon-close iconfont"></i></div>
-                    <ul class="apis-nav apis-nav-sub">
-                        <li>
-                            <div class="api-name" data-json='{"name":"登陆","requestMethod":"PUT","responseType":"TEXT","description":"啊打发打发"}'><span>接口文档</span><i class="icon-close iconfont"></i> <i class="icon-bianji1 iconfont"></i></div>
-                        </li>
-                        <li>
-                            <div class="api-name"><span>接口文档</span><i class="icon-close iconfont"></i></div>
-                        </li>
-                        <li>
-                            <div class="api-name"><span>接口文档</span><i class="icon-close iconfont"></i></div>
-                        </li>
-                        <li>
-                            <div class="api-name"><span>接口文档</span><i class="icon-close iconfont"></i></div>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <div class="api-name"><span>接口文档</span><i class="icon-close iconfont"></i>
-                        <i class="iconfont icon-bianji1"></i>
-                    </div>
-                </li>
-                <li>
-                    <div class="api-name api-new"><i class="icon-tianjia iconfont"></i> 添加接口</div>
+                <li id="api-new-folder" onclick="$(this).before($('#api-folder-template').html())">
+                    <div class="api-name api-folder-new"><i class="icon-tianjia iconfont"></i> 添加分类</div>
                 </li>
             </ul>
         </div>
@@ -137,16 +136,20 @@
             <div id="api-edit-details">
                 <p class="api-details-title">基本信息</p>
                 <div class="api-base-info api-edit-box">
-                    <p>请求地址: <span>http://www.baidu.com</span></p>
-                    <p>请求方式: <span>GET</span></p>
-                    <p>响应类型: <span>JSON</span></p>
+                    <p>请求地址: <span name="url" class="api-field">http://www.baidu.com</span></p>
+                    <p>请求方式: <span name="requestMethod" class="api-field">GET</span></p>
+                    <p>响应类型: <span name="responseType" class="api-field">JSON</span></p>
+                </div>
+                <p class="api-details-title">接口描述</p>
+                <div class="api-details-desc api-edit-box api-field" name="description">
+                    这是一段多文字,这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字
                 </div>
 
                 <p class="api-details-title">请求参数</p>
                 <script type="text/plain" id="requestArgTemplate">
-                    <tr>
+                    <tr data-level="{{level}}" class="api-tr-row-{{level}}">
                             <td><i class="iconfont icon-close" onclick="$(this).parent().parent().remove()"></i>
-                                <i class="iconfont icon-tianjia" onclick='$(this).parent().parent().after($("#requestArgTemplate").html())'></i>
+                                <i class="iconfont icon-tianjia api-add-sub" onclick='requestArgTypeAppend(this)'></i>
                             </td>
                             <td contenteditable="true"></td>
                             <td>
@@ -157,7 +160,8 @@
                             </td>
                             <td contenteditable="true"></td>
                             <td>
-                                <select name="" class="select">
+                                <select name="" class="select" onchange="requestArgTypeChange(this)">
+                                    <option></option>
                                     <option>string</option>
                                     <option>number</option>
                                     <option>boolean</option>
@@ -180,10 +184,10 @@
                         <th width="15%">类型</th>
                         <th>描述</th>
                     </tr></thead>
-                    <tbody>
+                    <tbody id="requestArgTbody">
                         <tr>
                             <td><i class="iconfont icon-close" onclick="$(this).parent().parent().remove()"></i>
-                                <i class="iconfont icon-tianjia" onclick='$(this).parent().parent().after($("#requestArgTemplate").html())'></i>
+                                <i class="api-add-sub iconfont icon-tianjia" onclick='requestArgTypeAppend(this)'></i>
                             </td>
                             <td contenteditable="true"></td>
                             <td>
@@ -194,7 +198,8 @@
                             </td>
                             <td contenteditable="true"></td>
                             <td>
-                                <select name="" class="select">
+                                <select name="" class="select" onchange="requestArgTypeChange(this)">
+                                    <option></option>
                                     <option>string</option>
                                     <option>number</option>
                                     <option>boolean</option>
@@ -207,10 +212,35 @@
                             </td>
                             <td contenteditable="true"></td>
                         </tr>
-
                     </tbody>
                 </table>
+                <div class="form-text">
+                    <button class="btn btn-primary" onclick="$('#requestArgTbody').append($('#requestArgTemplate').html())"><i class="iconfont icon-tianjia"></i>添加参数</button>
+                    <button class="btn btn-primary"><i class="iconfont icon-importexport"></i>导入json</button>
+                </div>
                 <p class="api-details-title">响应数据</p>
+                <script type="text/plain" id="responseArgTemplate">
+                        <tr data-level="{{level}}" class="api-tr-row-{{level}}">
+                            <td>
+                                <i class="iconfont icon-close" onclick="$(this).parent().parent().remove()"></i>
+                                <i class="api-add-sub iconfont icon-tianjia" onclick='responseArgTypeAppend(this)'></i>
+                            </td>
+                            <td contenteditable="true"></td>
+                            <td>
+                                <select name="" class="select" onchange="requestArgTypeChange(this)">
+                                    <option>string</option>
+                                    <option>number</option>
+                                    <option>boolean</option>
+                                    <option>object</option>
+                                    <option>array[object]</option>
+                                    <option>array[string]</option>
+                                    <option>array[number]</option>
+                                    <option>array[boolean]</option>
+                                </select>
+                            </td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                </script>
                 <table class="table" cellpadding="0" cellspacing="0">
                     <thead><tr>
                         <th class="edit-item" width="8%">操作</th>
@@ -218,12 +248,15 @@
                         <th width="15%">类型</th>
                         <th>描述</th>
                     </tr></thead>
-                    <tbody>
+                    <tbody id="responseArgTbody">
                         <tr>
-                            <td><i class="iconfont icon-close"></i><i class="iconfont icon-tianjia"></i></td>
+                            <td>
+                                <i class="iconfont icon-close" onclick="$(this).parent().parent().remove()"></i>
+                                <i class="api-add-sub iconfont icon-tianjia" onclick='responseArgTypeAppend(this)'></i>
+                            </td>
                             <td contenteditable="true"></td>
                             <td>
-                                <select name="" class="select">
+                                <select name="" class="select" onchange="requestArgTypeChange(this)">
                                     <option>string</option>
                                     <option>number</option>
                                     <option>boolean</option>
@@ -238,6 +271,12 @@
                         </tr>
                     </tbody>
                 </table>
+                <div class="form-text">
+                    <button class="btn btn-primary" onclick="$('#responseArgTbody').append($('#responseArgTemplate').html())"><i class="iconfont icon-tianjia"></i>添加参数</button>
+                    <button class="btn btn-primary"><i class="iconfont icon-importexport"></i>导入json</button>
+                </div>
+                <p class="api-details-title">示例数据</p>
+                <textarea class="api-example" placeholder="请添加一些示例数据"></textarea>
             </div>
         </div>
     </div>
@@ -387,7 +426,7 @@
                     </tr>
                     </tbody>
                 </table>
-                <p class="api-details-title">响应数据</p>
+                <p class="api-details-title">示例数据</p>
                 <textarea class="api-example" placeholder="请添加一些示例数据"></textarea>
                 <p class="api-details-title">演示</p>
                 <form class="api-test">
@@ -412,6 +451,7 @@
         </div>
     </div>
 </div>
+</div>
 <div class="modal modal-layer" ></div>
 <div class="modal-box modal" id="api-add-modal">
     <div class="container">
@@ -423,48 +463,61 @@
             <form action="">
                 <input type="hidden" name="id">
                 <div class="form-text">
-                    <div class="field-name">接口名称</div><div><input class="text" name="name" placeholder="团队名称" type="text"></div>
+                    <div class="field-name">接口名称</div><div><input class="text api-field" name="name" placeholder="接口名称" type="text"></div>
+                </div>
+                <div class="form-text">
+                    <div class="field-name">请求地址</div><div><input class="text api-field" name="url" placeholder="请求地址" type="text"></div>
                 </div>
                 <div class="form-text">
                     <div class="field-name">请求方式</div><div>
-                    <select class="select" name="requestMethod">
-                        <option>GET</option>
-                        <option>POST</option>
-                        <option>PUT</option>
-                        <option>PATCH</option>
-                        <option>DELETE</option>
-                        <option>HEAD</option>
-                        <option>OPTIONS</option>
-                    </select>
+                    
+                    <input type="radio" id="R-GET" name="requestMethod" value="GET">
+                    <label for="R-GET">GET</label>
+                    <input type="radio" id="R-POST"  name="requestMethod" value="POST">
+                    <label for="R-POST">POST</label>
+                    <input type="radio" id="R-PUT"  name="requestMethod" value="PUT">
+                    <label for="R-PUT">PUT</label>
+                    <input type="radio" id="R-PATCH" name="requestMethod"  value="PATCH">
+                    <label for="R-PATCH">PATCH</label>
+                    <input type="radio" id="R-DELETE"  name="requestMethod" value="DELETE">
+                    <label for="R-DELETE">DELETE</label>
+                    <input type="radio" id="R-HEAD" name="requestMethod"  value="HEAD">
+                    <label for="R-HEAD">HEAD</label>
+                    <input type="radio" id="R-OPTIONS" name="requestMethod"  value="OPTIONS">
+                    <label for="R-OPTIONS">OPTIONS</label>
                 </div>
                 </div>
                 <div class="form-text">
                     <div class="field-name">响应类型</div>
                     <div>
-                    <select class="select" name="responseType">
-                        <option>JSON</option>
-                        <option>TEXT</option>
-                        <option>XML</option>
-                    </select></div>
+                    <input type="radio" id="R-JSON"  name="responseType" value="application/json">
+                    <label for="R-JSON">application/json</label>
+                    <input type="radio" id="R-XML"  name="responseType" value="text/xml">
+                    <label for="R-XML">text/xml</label>
+                    <input type="radio" id="R-TXT"  name="responseType" value="text/plain">
+                    <label for="R-TXT">text/plain</label></div>
                 </div>
                 <div class="form-text">
-                    <div class="field-name">接口说明</div><div><textarea name="description" class="text" placeholder="接口描述" rows="5"></textarea></div>
+                    <div class="field-name">接口说明</div><div><textarea name="description" class="text api-field" placeholder="接口描述" rows="5"></textarea></div>
                 </div>
             </form>
         </div>
         <div class="footer">
-            <button class="btn btn-primary">确认</button>
+            <button data-type="new" class="btn btn-primary api-add-modal-ok">确认</button>
             <button class="btn btn-gray modal-close">取消</button>
         </div>
     </div>
 </div>
+
 </div>
+
+
 <script src="../assets/js/api.js"></script>
 <script type="text/javascript" charset="utf-8" src="../assets/umeditor/umeditor.config.js"></script>
 <script type="text/javascript" charset="utf-8" src="../assets/umeditor/umeditor.min.js"></script>
 <script type="text/javascript" src="../assets/umeditor/lang/zh-cn/zh-cn.js"></script>
 <footer class="ta-c">
-    小幺鸡@2016
+    apidoc@2016
 </footer>
 <script>
     var um = UM.getEditor('myEditor');

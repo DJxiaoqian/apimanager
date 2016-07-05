@@ -14,8 +14,8 @@ $.fn.reset= function(){
         function(){
             switch(this.type){
                 case 'passsword':
-                case 'select-multiple':
-                case 'select-one':
+                //case 'select-multiple':
+                //case 'select-one':
                 case 'text':
                 case 'textarea':
                     $(this).val('');
