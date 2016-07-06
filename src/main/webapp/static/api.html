@@ -14,7 +14,7 @@
     <script src="../assets/js/jquery.min.js"></script>
     <script src="../assets/js/g.js"></script>
 </head>
-<body class="api-body">
+<body class="api-body api-editing">
 <header>
     <div class="top">
         <div class="lading" id="loading"></div>
@@ -70,388 +70,356 @@
 <section class="api-sec1">
     <div class="api-sec1-desc ta-c">APIDOC是一个可视化接口管理系统</div>
 </section>
+<!-- api module begin -->
 <div class="api-modules">
     <div class="mc cb">
-        <ul>
-            <li class="api-module fl active">
-                <span>接口文档</span><i class="icon-close iconfont"></i>
-            </li>
-            <li class="api-module fl">
-                <span>接口文档</span><i class="icon-close iconfont"></i>
-            </li>
-            <li class="api-module fl">
-                <span>接口文档</span><i class="icon-close iconfont"></i>
-            </li>
-            <li class="api-module fl api-new-module" contenteditable="true">请输入模块名称</li>
-            <li class="api-module fl api-module-plus"><i class="icon-tianjia iconfont"></i></li>
-            <li class="api-module fr api-export"><i class="icon-export iconfont"></i><span>导出</span></li>
-            <li class="api-module fr api-edit"><i class="icon-bianji iconfont"></i><span>编辑</span></li>
-            <li class="api-module fr api-cancel" onclick="location.reload()"><i class="icon-cancel iconfont"></i><span>取消</span></li>
-            <li class="api-module fr api-save"><i class="icon-save iconfont"></i><span>保存</span></li>
-        </ul>
+<script type="text/plain" id="api-module-template">
+    <li class="api-module fl api-module-item"><span onclick="module.txtOnClick(this)" onblur="module.txtOnBlur(this)">{{name}}</span><i onclick="module.remove(this)" class="icon-close iconfont"></i><i onclick="module.edit(this)" class="icon-bianji iconfont"></i></li>
+</script>
+<script type="text/html" id="api-modules-template">
+    {{each list}}
+    <li data-id="{{$value.id}}" class="api-module fl {{if $index==0}}active{{/if}} api-module-item">
+        <span onclick="module.txtOnClick(this)" onblur="module.txtOnBlur(this)">{{$value.name}}</span><i onclick="module.remove(this)" class="icon-close iconfont"></i><i onclick="module.edit(this)" class="icon-bianji iconfont"></i>
+    </li>
+    {{/each}}
+    <li class="api-module fl api-new-module api-module-item" contenteditable="true">请输入模块名称</li>
+    <li class="api-module fl api-module-plus"><i class="icon-tianjia iconfont"></i></li>
+    <li class="api-module fr api-export"><i class="icon-export iconfont"></i><span>导出</span></li>
+    <li class="api-module fr api-edit" id="api-edit" onclick="module.editClick(this)"><i class="icon-bianji iconfont"></i><span>编辑</span></li>
+    <li class="api-module fr api-cancel" id="api-cancel" onclick="location.reload()"><i class="icon-cancel iconfont"></i><span>取消</span></li>
+    <li class="api-module fr api-save" id="api-save" onclick="module.saveClick(this)"><i class="icon-save iconfont"></i><span>保存</span></li>
+</script>
+        <ul id="api-modules"></ul>
     </div>
 </div>
-
-
-<div id="api-edit-box" class="apis">
+<!-- api module end -->
+<!-- api editbox begin -->
+<div id="api-edit-box" class="apis hide">
     <div class="mc cb api-container">
         <div class="fl apis-left">
-            <script type="text/plain" id="api-folder-template">
+            <script type="text/html" id="api-folder-template">
                 <li>
                     <div class="api-name api-folder open">
-                        <i onclick="folderToggleSlide(this)" class="icon-angeldownblock iconfont"></i>   
+                        <i onclick="editor.folderToggleSlide(this)" class="icon-angeldownblock iconfont"></i>
                         <span contenteditable="true">文件夹名称</span>
-                        <i onclick="apiDelete(this)" class="icon-close iconfont"></i>
-                        <i onclick="apiEdit(this)" class="icon-bianji iconfont api-new"></i>
-                        <i onclick="newApi(this)" class="icon-tianjia iconfont api-new"></i>
+                        <i onclick="editor.apiDelete(this)" class="icon-close iconfont"></i>
+                        <i onclick="editor.apiEdit(this)" class="icon-bianji iconfont api-new"></i>
+                        <i onclick="editor.newApi(this)" class="icon-tianjia iconfont api-new"></i>
                     </div>
                     <ul class="apis-nav apis-nav-sub"></ul>
                 </li>
             </script>
-            <script type="text/plain" id="api-item-template">
+            <script type="text/html" id="api-item-template">
                 <li>
                     <div class="api-name" data-json='{{json}}'>
-                    <span onclick="turnRight(this)">{{name}}</span>
-                        <i onclick="apiDelete(this)" class="icon-close iconfont"></i>
-                        <i onclick="apiEdit(this)" class="icon-bianji iconfont api-new"></i>
+                    <span onclick="editor.turnRight(this)">{{name}}</span>
+                        <i onclick="editor.apiDelete(this)" class="icon-close iconfont"></i>
+                        <i onclick="editor.apiEdit(this)" class="icon-bianji iconfont api-new"></i>
                     </div>
                 </li>
             </script>
-            <ul class="apis-nav">
-                <li>
-                    <div class="api-name api-description active" onclick="turnRightDoc(this)">
-                        <span>接口说明</span>
-                    </div>
-                </li>
-                <li id="api-new-folder" onclick="$(this).before($('#api-folder-template').html())">
-                    <div class="api-name api-folder-new"><i class="icon-tianjia iconfont"></i> 添加分类</div>
-                </li>
-            </ul>
+<!-- api接口列表模版 -->
+<script type="text/html" id="api-edit-nav-template">
+    <li>
+        <div class="api-name api-description active" onclick="editor.turnRightDoc(this)">
+            <span>接口说明</span>
+        </div>
+    </li>
+    {{each list}}
+    <li data-id="{{$value.id}}">
+        <div class="api-name api-folder open">
+            <i onclick="editor.folderToggleSlide(this)" class="icon-angeldownblock iconfont"></i>
+            <span contenteditable="true">文件夹名称</span>
+            <i onclick="editor.apiDelete(this)" class="icon-close iconfont"></i>
+            <i onclick="editor.apiEdit(this)" class="icon-bianji iconfont api-new"></i>
+            <i onclick="editor.newApi(this)" class="icon-tianjia iconfont api-new"></i>
+        </div>
+
+        <ul class="apis-nav apis-nav-sub">
+            {{each $value.children as c}}
+            <li data-id="{{c.id}}">
+                <div class="api-name" data-json='{{c | jsonFormat}}'>
+                    <span onclick="editor.turnRight(this)">{{c.name}}</span>
+                    <i onclick="editor.apiDelete(this)" class="icon-close iconfont"></i>
+                    <i onclick="editor.apiEdit(this)" class="icon-bianji iconfont api-new"></i>
+                </div>
+            </li>
+            {{/each}}
+        </ul>
+
+    </li>
+    {{/each}}
+    <li id="api-new-folder" onclick="$(this).before($('#api-folder-template').html())">
+        <div class="api-name api-folder-new"><i class="icon-tianjia iconfont"></i> 添加分类</div>
+    </li>
+</script>
+<ul class="apis-nav" id="api-edit-nav"></ul>
         </div>
         <div class="api-content fl">
-            <div id="api-edit-description" class="api-doc-desc hide">
+            <div id="api-edit-description" class="api-doc-desc">
                 <div class="apis-module-name">接口说明</div>
                 <script type="text/plain" id="myEditor" style="width:900px;height:500px;"><p>在这里可以记录一些模块注意说明等</p></script>
             </div>
-            <div id="api-edit-details">
-                <p class="api-details-title">基本信息</p>
-                <div class="api-base-info api-edit-box">
-                    <p>请求地址: <span name="url" class="api-field">http://www.baidu.com</span></p>
-                    <p>请求方式: <span name="requestMethod" class="api-field">GET</span></p>
-                    <p>响应类型: <span name="responseType" class="api-field">JSON</span></p>
-                </div>
-                <p class="api-details-title">接口描述</p>
-                <div class="api-details-desc api-edit-box api-field" name="description">
-                    这是一段多文字,这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字
-                </div>
-
-                <p class="api-details-title">请求参数</p>
-                <script type="text/plain" id="requestArgTemplate">
-                    <tr data-level="{{level}}" class="api-tr-row-{{level}}">
-                            <td><i class="iconfont icon-close" onclick="$(this).parent().parent().remove()"></i>
-                                <i class="iconfont icon-tianjia api-add-sub" onclick='requestArgTypeAppend(this)'></i>
-                            </td>
-                            <td contenteditable="true"></td>
-                            <td>
-                                <select name="" class="select">
-                                    <option>true</option>
-                                    <option>false</option>
-                                </select>
-                            </td>
-                            <td contenteditable="true"></td>
-                            <td>
-                                <select name="" class="select" onchange="requestArgTypeChange(this)">
-                                    <option></option>
-                                    <option>string</option>
-                                    <option>number</option>
-                                    <option>boolean</option>
-                                    <option>object</option>
-                                    <option>array[object]</option>
-                                    <option>array[string]</option>
-                                    <option>array[number]</option>
-                                    <option>array[boolean]</option>
-                                </select>
-                            </td>
-                            <td contenteditable="true"></td>
-                        </tr>
-                </script>
-                <table class="table" cellpadding="0" cellspacing="0">
-                    <thead><tr>
-                        <th width="8%">操作</th>
-                        <th width="20%">参数名称</th>
-                        <th width="15%">是否必须</th>
-                        <th width="20%">默认值</th>
-                        <th width="15%">类型</th>
-                        <th>描述</th>
-                    </tr></thead>
-                    <tbody id="requestArgTbody">
-                        <tr>
-                            <td><i class="iconfont icon-close" onclick="$(this).parent().parent().remove()"></i>
-                                <i class="api-add-sub iconfont icon-tianjia" onclick='requestArgTypeAppend(this)'></i>
-                            </td>
-                            <td contenteditable="true"></td>
-                            <td>
-                                <select name="" class="select">
-                                    <option>true</option>
-                                    <option>false</option>
-                                </select>
-                            </td>
-                            <td contenteditable="true"></td>
-                            <td>
-                                <select name="" class="select" onchange="requestArgTypeChange(this)">
-                                    <option></option>
-                                    <option>string</option>
-                                    <option>number</option>
-                                    <option>boolean</option>
-                                    <option>object</option>
-                                    <option>array[object]</option>
-                                    <option>array[string]</option>
-                                    <option>array[number]</option>
-                                    <option>array[boolean]</option>
-                                </select>
-                            </td>
-                            <td contenteditable="true"></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="form-text">
-                    <button class="btn btn-primary" onclick="$('#requestArgTbody').append($('#requestArgTemplate').html())"><i class="iconfont icon-tianjia"></i>添加参数</button>
-                    <button class="btn btn-primary"><i class="iconfont icon-importexport"></i>导入json</button>
-                </div>
-                <p class="api-details-title">响应数据</p>
-                <script type="text/plain" id="responseArgTemplate">
-                        <tr data-level="{{level}}" class="api-tr-row-{{level}}">
-                            <td>
-                                <i class="iconfont icon-close" onclick="$(this).parent().parent().remove()"></i>
-                                <i class="api-add-sub iconfont icon-tianjia" onclick='responseArgTypeAppend(this)'></i>
-                            </td>
-                            <td contenteditable="true"></td>
-                            <td>
-                                <select name="" class="select" onchange="requestArgTypeChange(this)">
-                                    <option>string</option>
-                                    <option>number</option>
-                                    <option>boolean</option>
-                                    <option>object</option>
-                                    <option>array[object]</option>
-                                    <option>array[string]</option>
-                                    <option>array[number]</option>
-                                    <option>array[boolean]</option>
-                                </select>
-                            </td>
-                            <td contenteditable="true"></td>
-                        </tr>
-                </script>
-                <table class="table" cellpadding="0" cellspacing="0">
-                    <thead><tr>
-                        <th class="edit-item" width="8%">操作</th>
-                        <th width="20%">参数名称</th>
-                        <th width="15%">类型</th>
-                        <th>描述</th>
-                    </tr></thead>
-                    <tbody id="responseArgTbody">
-                        <tr>
-                            <td>
-                                <i class="iconfont icon-close" onclick="$(this).parent().parent().remove()"></i>
-                                <i class="api-add-sub iconfont icon-tianjia" onclick='responseArgTypeAppend(this)'></i>
-                            </td>
-                            <td contenteditable="true"></td>
-                            <td>
-                                <select name="" class="select" onchange="requestArgTypeChange(this)">
-                                    <option>string</option>
-                                    <option>number</option>
-                                    <option>boolean</option>
-                                    <option>object</option>
-                                    <option>array[object]</option>
-                                    <option>array[string]</option>
-                                    <option>array[number]</option>
-                                    <option>array[boolean]</option>
-                                </select>
-                            </td>
-                            <td contenteditable="true"></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="form-text">
-                    <button class="btn btn-primary" onclick="$('#responseArgTbody').append($('#responseArgTemplate').html())"><i class="iconfont icon-tianjia"></i>添加参数</button>
-                    <button class="btn btn-primary"><i class="iconfont icon-importexport"></i>导入json</button>
-                </div>
-                <p class="api-details-title">示例数据</p>
-                <textarea class="api-example" placeholder="请添加一些示例数据"></textarea>
-            </div>
+<script type="text/html" id="api-edit-details-template">
+    <p class="api-details-title">基本信息</p>
+    <div class="api-base-info api-edit-box">
+        <p>请求地址: {{url}}</p>
+        <p>请求方式: {{requestMethod}}</p>
+        <p>响应类型: {{responseType}}</p>
+    </div>
+    <p class="api-details-title">接口描述</p>
+    <div class="api-details-desc api-edit-box">{{#description}}</div>
+    <p class="api-details-title">请求参数</p>
+    <table class="table" cellpadding="0" cellspacing="0">
+        <thead><tr>
+            <th width="8%">操作</th>
+            <th width="20%">参数名称</th>
+            <th width="15%">是否必须</th>
+            <th width="20%">默认值</th>
+            <th width="15%">类型</th>
+            <th>描述</th>
+        </tr></thead>
+        <tbody id="requestArgTbody">
+        <tr data-level="1">
+            <td><i class="iconfont icon-close" onclick="editor.removeRow(this)"></i>
+                <i class="api-add-sub iconfont icon-tianjia" onclick='editor.requestArgTypeAppend(this)'></i>
+            </td>
+            <td contenteditable="true" class="td-name"></td>
+            <td>
+                <select name="" class="select">
+                    <option>true</option>
+                    <option>false</option>
+                </select>
+            </td>
+            <td contenteditable="true"></td>
+            <td>
+                <select name="" class="select" onchange="editor.requestArgTypeChange(this)">
+                    <option></option>
+                    <option>string</option>
+                    <option>number</option>
+                    <option>boolean</option>
+                    <option>object</option>
+                    <option>array[object]</option>
+                    <option>array[string]</option>
+                    <option>array[number]</option>
+                    <option>array[boolean]</option>
+                </select>
+            </td>
+            <td contenteditable="true"></td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="form-text">
+        <button class="btn btn-primary" onclick="$('#requestArgTbody').append($('#requestArgTemplate').html().replace(/{{level}}/g,1))"><i class="iconfont icon-tianjia"></i>添加参数</button>
+        <button class="btn btn-primary"><i class="iconfont icon-importexport"></i>导入json</button>
+    </div>
+    <p class="api-details-title">响应数据</p>
+    <table class="table" cellpadding="0" cellspacing="0">
+        <thead><tr>
+            <th class="edit-item" width="8%">操作</th>
+            <th width="20%">参数名称</th>
+            <th width="15%">类型</th>
+            <th>描述</th>
+        </tr></thead>
+        <tbody id="responseArgTbody">
+        <tr data-level="1">
+            <td>
+                <i class="iconfont icon-close" onclick="editor.removeRow(this)"></i>
+                <i class="api-add-sub iconfont icon-tianjia" onclick='editor.responseArgTypeAppend(this)'></i>
+            </td>
+            <td contenteditable="true" class="td-name"></td>
+            <td>
+                <select name="" class="select" onchange="editor.requestArgTypeChange(this)">
+                    <option>string</option>
+                    <option>number</option>
+                    <option>boolean</option>
+                    <option>object</option>
+                    <option>array[object]</option>
+                    <option>array[string]</option>
+                    <option>array[number]</option>
+                    <option>array[boolean]</option>
+                </select>
+            </td>
+            <td contenteditable="true"></td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="form-text">
+        <button class="btn btn-primary" onclick="$('#responseArgTbody').append($('#responseArgTemplate').html().replace(/{{level}}/g,1))"><i class="iconfont icon-tianjia"></i>添加参数</button>
+        <button class="btn btn-primary"><i class="iconfont icon-importexport"></i>导入json</button>
+    </div>
+    <p class="api-details-title">示例数据</p>
+    <textarea class="api-example" placeholder="请添加一些示例数据">{{example}}</textarea>
+</script>
+<!-- 请求参数模版 -->
+<script type="text/html" id="requestArgTemplate">
+    <tr data-level="{{level}}" class="api-tr-row-{{level}}">
+        <td><i class="iconfont icon-close" onclick="editor.removeRow(this)"></i>
+            <i class="iconfont icon-tianjia api-add-sub" onclick='requestArgTypeAppend(this)'></i>
+        </td>
+        <td contenteditable="true" class="td-name"></td>
+        <td>
+            <select name="" class="select">
+                <option>true</option>
+                <option>false</option>
+            </select>
+        </td>
+        <td contenteditable="true"></td>
+        <td>
+            <select name="" class="select" onchange="requestArgTypeChange(this)">
+                <option></option>
+                <option>string</option>
+                <option>number</option>
+                <option>boolean</option>
+                <option>object</option>
+                <option>array[object]</option>
+                <option>array[string]</option>
+                <option>array[number]</option>
+                <option>array[boolean]</option>
+            </select>
+        </td>
+        <td contenteditable="true"></td>
+    </tr>
+</script>
+<!-- 响应参数模版 -->
+<script type="text/html" id="responseArgTemplate">
+    <tr data-level="{{level}}" class="api-tr-row-{{level}}">
+        <td>
+            <i class="iconfont icon-close" onclick="editor.removeRow(this)"></i>
+            <i class="api-add-sub iconfont icon-tianjia" onclick='editor.responseArgTypeAppend(this)'></i>
+        </td>
+        <td contenteditable="true" class="td-name"></td>
+        <td>
+            <select name="" class="select" onchange="editor.requestArgTypeChange(this)">
+                <option>string</option>
+                <option>number</option>
+                <option>boolean</option>
+                <option>object</option>
+                <option>array[object]</option>
+                <option>array[string]</option>
+                <option>array[number]</option>
+                <option>array[boolean]</option>
+            </select>
+        </td>
+        <td contenteditable="true"></td>
+    </tr>
+</script>
+            <div id="api-edit-details" class="hide"></div>
         </div>
     </div>
 </div>
+<!-- api editbox end -->
+<!-- api viewbox begin -->
 <div id="api-view-box">
 <div class="apis">
     <div class="api-container mc cb">
     <div class="fl apis-left">
         <div class="apis-module-name">接口文档</div>
         <div style="height: 1px;background: #d6d6d6;margin-bottom: 10px;"></div>
-        <ul class="apis-nav">
+        <script id="api-nav-template" type="text/html">
             <li>
-                <div class="api-name api-description active" data-target="#api-doc-desc">
+                <div class="api-name api-description active">
                     <span>接口说明</span>
                 </div>
             </li>
-            <li>
-                <div class="api-name api-folder open"><span>用户管理</span></div>
-                <ul class="apis-nav apis-nav-sub">
-                    <li>
-                        <div class="api-name" data-json='{"name":"登陆","requestMethod":"PUT","responseType":"TEXT","description":"啊打发打发"}'><span>接口文档</span></div>
-                    </li>
-                    <li><div class="api-name"><span>接口文档</span></div>
-                    </li>
-                    <li><div class="api-name"><span>接口文档</span></div>
-                    </li>
-                    <li>
-                        <div class="api-name"><span>接口文档</span></div>
-                    </li>
-                </ul>
-            </li>
-            <li>
-                <div class="api-name"><span>接口文档</span></div>
-            </li>
-            <li>
-                <div class="api-name"><span>接口文档</span></div>
-            </li>
-            <li>
-                <div class="api-name"><span>接口文档</span></div>
-            </li>
-            <li>
-                <div class="api-name"><span>接口文档</span></div>
-            </li>
-        </ul>
+            {{each list}}
+                <li data-id="{{$value.id}}">
+                    <div class="api-name api-folder open"><span>{{$value.name}}</span></div>
+                    {{if $value.children}}
+                    <ul class="apis-nav apis-nav-sub">
+                        {{each $value.children as c}}
+                        <li data-id="{{c.id}}" data-json='{{c | jsonFormat}}'>
+                            <div class="api-name"><span>{{c.name}}</span></div>
+                        </li>
+                        {{/each}}
+                        </li>
+                    </ul>
+                    {{/if}}
+                </li>
+            {{/each}}
+        </script>
+        <ul class="apis-nav" id="api-nav"></ul>
     </div>
         <div class="api-content fl">
             <div class="cb">
                 <h3 class="apis-module-name fl">接口文档</h3>
-                <span class="api-update-time fr">更新时间: 2016/08/19 12:12:22</span>
+                <span class="api-update-time fr">更新时间: <span id="lastupdatetime"></span></span>
             </div>
-            <div id="api-doc-desc" class="api-doc-desc hide">
-                <p>
-                    <br/>
-                </p>
-                <h1 id="s0" style="margin: 0px 0px 35px; font-family: FZLanTingHei; font-weight: normal; line-height: 20px; color: rgb(51, 51, 51); text-rendering: optimizeLegibility; font-size: 22px; padding: 0px 0px 12px; height: 20px; position: relative; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(221, 221, 221); white-space: normal;">
-                    概述
-                </h1>
-                <p style="margin-top: 15px; margin-bottom: 15px; padding: 0px; font-family: FZLanTingHei; line-height: 20px; color: rgb(51, 51, 51); font-stretch: normal; font-size: 14px; word-wrap: break-word; word-break: break-all; white-space: normal;">
-                    淘宝开放平台SDK提供了API的请求封装、摘要签名、响应解释、消息监听等功能，使用SDK可以轻松完成API的调用，API结果的获取，消息的实时监听。
-                </p>
-                <h1 id="s1" style="margin: 37px 0px 35px; font-family: FZLanTingHei; font-weight: normal; line-height: 20px; color: rgb(51, 51, 51); text-rendering: optimizeLegibility; font-size: 22px; padding: 0px 0px 12px; height: 20px; position: relative; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(221, 221, 221); white-space: normal;">
-                    环境依赖
-                </h1>
-                <ul style="padding: 0px; margin: 0px; list-style: none; font-family: FZLanTingHei; color: rgb(51, 51, 51); font-size: 12px; line-height: 18px; white-space: normal;">
-                    <li style="margin: 0px; padding: 0px 0px 0px 40px; background: url(&quot;http://img01.taobaocdn.com/tps/i1/T1e0OkXm4qXXXXXXXX-4-4.png&quot;) 25px 9px no-repeat;">
-                        JAVA SDK 需要依赖 Java SE/EE 1.5及以上 （不支持Android平台）
-                    </li>
-                    <li style="margin: 0px; padding: 0px 0px 0px 40px; background: url(&quot;http://img01.taobaocdn.com/tps/i1/T1e0OkXm4qXXXXXXXX-4-4.png&quot;) 25px 9px no-repeat;">
-                        .NET SDK 需要依赖 .NET Framework 2.0及以上 （不支持Windows Phone平台）
-                    </li>
-                    <li style="margin: 0px; padding: 0px 0px 0px 40px; background: url(&quot;http://img01.taobaocdn.com/tps/i1/T1e0OkXm4qXXXXXXXX-4-4.png&quot;) 25px 9px no-repeat;">
-                        PHP SDK 需要依赖 PHP 5及以上
-                    </li>
-                    <li style="margin: 0px; padding: 0px 0px 0px 40px; background: url(&quot;http://img01.taobaocdn.com/tps/i1/T1e0OkXm4qXXXXXXXX-4-4.png&quot;) 25px 9px no-repeat;">
-                        Python SDK 需要依赖 Python 2.7以及上
-                    </li>
-                </ul>
-                <h1 id="s2" style="margin: 37px 0px 35px; font-family: FZLanTingHei; font-weight: normal; line-height: 20px; color: rgb(51, 51, 51); text-rendering: optimizeLegibility; font-size: 22px; padding: 0px 0px 12px; height: 20px; position: relative; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(221, 221, 221); white-space: normal;">
-                    如何下载
-                </h1>
-                <p style="margin-top: 15px; margin-bottom: 15px; padding: 0px; font-family: FZLanTingHei; line-height: 20px; color: rgb(51, 51, 51); font-stretch: normal; font-size: 14px; word-wrap: break-word; word-break: break-all; white-space: normal;">
-                    由于应用要先拥有API的访问权限，才能调用此API，所以SDK的下载是与应用相关联的，不同的应用下载到的SDK是各不一样的。
-                </p>
-                <p style="margin-top: 15px; margin-bottom: 15px; padding: 0px; font-family: FZLanTingHei; line-height: 20px; color: rgb(51, 51, 51); font-stretch: normal; font-size: 14px; word-wrap: break-word; word-break: break-all; white-space: normal;">
-                    第一步：注册成为淘宝开放平台开发者，并创建一个应用（如果此步已完成，可跳过）<br/>第二步：登录淘宝开放平台，进入<a href="http://my.open.taobao.com/" style="color: rgb(0, 137, 205); text-decoration: none; cursor: pointer;">控制台</a>，进入其中一个应用的SDK下载页面<br/><img src="http://img.alicdn.com/top/i1/LB1XNzTJVXXXXbzXpXXXXXXXXXX" alt="image" style="max-width: 99%; height: auto; vertical-align: middle; border: 0px; position: relative; display: block; margin: 16px 0px; overflow: hidden; padding: 4px;"/><br/>第三步：选择需要的语言进行下载，如果需要下载最新的SDK，请点击重新生成<br/><img src="http://img.alicdn.com/top/i1/LB1ISHTJVXXXXb6XpXXXXXXXXXX" alt="image" style="max-width: 99%; height: auto; vertical-align: middle; border: 0px; position: relative; display: block; margin: 16px 0px; overflow: hidden; padding: 4px;"/>
-                </p>
-                <h1 id="s3" style="margin: 37px 0px 35px; font-family: FZLanTingHei; font-weight: normal; line-height: 20px; color: rgb(51, 51, 51); text-rendering: optimizeLegibility; font-size: 22px; padding: 0px 0px 12px; height: 20px; position: relative; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(221, 221, 221); white-space: normal;">
-                    如何使用
-                </h1>
-                <p style="margin-top: 15px; margin-bottom: 15px; padding: 0px; font-family: FZLanTingHei; line-height: 20px; color: rgb(51, 51, 51); font-stretch: normal; font-size: 14px; word-wrap: break-word; word-break: break-all; white-space: normal;">
-                    进入任意一个API的详情页面，查看API的<a href="http://open.taobao.com/doc2/apiDetail?apiId=21349#s3" style="color: rgb(0, 137, 205); text-decoration: none; cursor: pointer;">请求示例</a>
-                </p>
-                <p>
-                    <br/>
-                </p>
-            </div>
+            <div id="api-doc-desc" class="api-doc-desc hide"></div>
+<script type="text/html" id="api-view-details-reqtr-template">
+    <tr  class="api-tr-row-{{level}}"><td class="td-name field-name">{{name}}</td> <td>{{require}}</td> <td>{{defaultValue}}</td> <td>{{type}}</td> <td>{{description}}</td> </tr>
+</script>
+<script type="text/html" id="api-view-details-resptr-template">
+    <tr class="api-tr-row-{{level}}"><td class="field-name td-name">{{name}}</td> <td>{{type}}</td> <td>{{description}}</td> </tr>
+</script>
 
-            <div id="api-details" class="api-details">
-                <div class="api-details-desc api-edit-box">
-                    <span class="content">这是一段多文字,这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字这是一段多文字</span>
-                </div>
-                <p class="api-details-title">基本信息</p>
-                <div class="api-base-info api-edit-box">
-                    <p>请求地址: http://www.baidu.com</p>
-                    <p>请求方式: GET</p>
-                    <p>响应类型: JSON</p>
-                </div>
-                <p class="api-details-title">请求参数</p>
-                <table class="table" cellpadding="0" cellspacing="0">
-                    <thead><tr>
-                        <th width="20%">参数名称</th>
-                        <th>是否必须</th>
-                        <th>默认值</th>
-                        <th>类型</th>
-                        <th>描述</th>
-                    </tr></thead>
-                    <tbody>
-                    <tr>
-                        <td>name</td>
-                        <td>true</td>
-                        <td>true</td>
-                        <td>object</td>
-                        <td>名称</td>
-                    </tr>
-                    </tbody>
-                </table>
-                <p class="api-details-title">响应数据</p>
-                <table class="table" cellpadding="0" cellspacing="0">
-                    <thead><tr>
-                        <th class="edit-item" width="5%">操作</th>
-                        <th width="20%">参数名称</th>
-                        <th>类型</th>
-                        <th>描述</th>
-                    </tr></thead>
-                    <tbody>
-                    <tr>
-                        <td class="edit-item"><i class="iconfont icon-close"></i><i class="iconfont icon-tianjia"></i></td>
-                        <td class="field-name">name</td>
-                        <td>string</td>
-                        <td>名称</td>
-                    </tr>
-                    <tr>
-                        <td class="edit-item"><i class="iconfont icon-close"></i><i class="iconfont icon-tianjia"></i></td>
-                        <td class="field-name">password</td>
-                        <td>string</td>
-                        <td>密码密码密码</td>
-                    </tr>
-                    </tbody>
-                </table>
-                <p class="api-details-title">示例数据</p>
-                <textarea class="api-example" placeholder="请添加一些示例数据"></textarea>
-                <p class="api-details-title">演示</p>
-                <form class="api-test">
-                    <div class="form-text cb">
-                        <div class="text-field-name fl">name</div>
-                        <div class="text-value fl"><input type="text" class="text"></div>
-                    </div>
-                    <div class="form-text cb">
-                        <div class="text-field-name fl">name</div>
-                        <div class="text-value fl"><input type="text" class="text"></div>
-                    </div>
-                    <div class="form-text cb">
-                        <div class="text-field-name fl">name</div>
-                        <div class="text-value fl"><input type="text" class="text"></div>
-                    </div>
-                    <div class="form-text cb" >
-                        <div class="text-field-name fl"></div>
-                        <div class="text-value fl"><input type="button" class="btn btn-primary" value="提交"></div>
-                    </div>
-                </form>
-            </div>
+<script type="text/html" id="api-view-details-template">
+    <div class="api-details-desc api-edit-box">
+        <span class="content">{{#description}}</span>
+    </div>
+    <p class="api-details-title">基本信息</p>
+    <div class="api-base-info api-edit-box">
+        <p>请求地址: {{url}}</p>
+        <p>请求方式: {{requestMethod}}</p>
+        <p>响应类型: {{responseType}}</p>
+    </div>
+    {{if requestArgs&& requestArgs.length>0}}
+    <p class="api-details-title">请求参数</p>
+    <table class="table" cellpadding="0" cellspacing="0">
+        <thead><tr>
+            <th width="20%">参数名称</th>
+            <th>是否必须</th>
+            <th>默认值</th>
+            <th>类型</th>
+            <th>描述</th>
+        </tr></thead>
+        <tbody>
+        {{#requestArgsBody}}
+        </tbody>
+    </table>
+    {{/if}}
+    {{if responseArgs&& responseArgs.length>0}}
+    <p class="api-details-title">响应数据</p>
+    <table class="table" cellpadding="0" cellspacing="0">
+        <thead><tr>
+            <th width="20%">参数名称</th>
+            <th>类型</th>
+            <th>描述</th>
+        </tr></thead>
+        <tbody>
+        {{#responseArgsBody}}
+    </table>
+    {{/if}}
+    {{if example}}
+    <p class="api-details-title">示例数据</p>
+    <textarea class="api-example" placeholder="请添加一些示例数据">{{example}}</textarea>
+    {{/if}}
+    {{if requestArgs&& requestArgs.length>0}}
+    <p class="api-details-title">演示</p>
+    <form class="api-test" action="{{url}}" method="{{requestMethod}}" data-response="{{responseType}}">
+        {{each requestArgs}}
+        <div class="form-text cb">
+            <div class="text-field-name fl">{{$value.name}}</div>
+            <div class="text-value fl"><input type="text" name="{{$value.name}}" placeholder="{{$value.description}}" class="text"></div>
+        </div>
+        {{/each}}
+        <div class="form-text cb" >
+            <div class="text-field-name fl"></div>
+            <div class="text-value fl"><input type="button" onclick="apis.submitExample(this,'{{id}}')" class="btn btn-primary" value="提交"></div>
+        </div>
+    </form>
+    {{/if}}
+    {{if resultData}}
+    <p class="api-details-title">结果数据</p>
+    <pre>{{resultData}}</pre>
+    {{/if}}
+</script>
+            <div id="api-details" class="api-details"></div>
         </div>
     </div>
 </div>
 </div>
+<!-- api viewbox end -->
 <div class="modal modal-layer" ></div>
 <div class="modal-box modal" id="api-add-modal">
     <div class="container">
@@ -503,7 +471,7 @@
             </form>
         </div>
         <div class="footer">
-            <button data-type="new" class="btn btn-primary api-add-modal-ok">确认</button>
+            <button data-type="new" id="api-add-modal-ok" class="btn btn-primary api-add-modal-ok">确认</button>
             <button class="btn btn-gray modal-close">取消</button>
         </div>
     </div>
@@ -513,6 +481,7 @@
 
 
 <script src="../assets/js/api.js"></script>
+<script src="../assets/arttemplate/template.js"></script>
 <script type="text/javascript" charset="utf-8" src="../assets/umeditor/umeditor.config.js"></script>
 <script type="text/javascript" charset="utf-8" src="../assets/umeditor/umeditor.min.js"></script>
 <script type="text/javascript" src="../assets/umeditor/lang/zh-cn/zh-cn.js"></script>
@@ -521,6 +490,62 @@
 </footer>
 <script>
     var um = UM.getEditor('myEditor');
+    var gdata={
+        result:{"c1":"俺的沙发大"},
+        modules:[{"id":"m1","name":"后台管理系统","description":"我擦擦都擦擦撒发射点发射点\nadfad啊多发点","lastupdatetime":"2016-02-02"},
+            {"id":"m2","name":"微信端","description":"微信端的简介"},{"id":"m3","name":"APP"}],
+        apis:{
+            "m1":[
+                {"id":"f1","name":"角色管理","children":[
+                    {"id":"c1","name":"添加角色","lastupdatetime":"2016/2/1","url":"http://www.qq.com","requestMethod":"GET","responseType":"application/json","description":"接口说明士大夫撒",
+                        "example":"{sdfadfa}",
+                        "requestArgs":[
+                            {"name":"name","require":"true","defaultValue":"","type":"string","description":"是短发接口和咖啡","children":[
+                                {"name":"name","require":"true","defaultValue":"","type":"string","description":"是短发接口和咖啡"},
+                                {"name":"name","require":"true","defaultValue":"","type":"string","description":"是短发接口和咖啡"}
+                            ]}
+                        ],"responseArgs":[
+                            {"name":"code","type":"number","description":"-1,0"},
+                            {"name":"data","type":"object","description":"","children":[
+                                {"name":"users","type":"object","children":[
+                                    {"name":"name","type":"number","description":"-1,0","children":[
+                                        {"name":"name","type":"number","description":"-1,0"},
+                                        {"name":"pass","type":"number","description":"-1,0"},
+                                        {"name":"code","type":"number","description":"-1,0"},
+                                        {"name":"code","type":"number","description":"-1,0","children":[
+                                            {"name":"name","type":"number","description":"-1,0"},
+                                            {"name":"pass","type":"number","description":"-1,0"},
+                                            {"name":"code","type":"number","description":"-1,0"},
+                                            {"name":"code","type":"number","description":"-1,0"}
+                                        ]}
+                                    ]},
+                                    {"name":"pass","type":"number","description":"-1,0"},
+                                    {"name":"code","type":"number","description":"-1,0"},
+                                    {"name":"code","type":"number","description":"-1,0"}
+                                ]},
+                                {"name":"fileAccess","type":"string","description":"图片服务器前缀"}
+                            ]}
+                        ]
+                    },
+                    {"id":"c2","name":"删除角色","url":"http://www.aa.com","requestMethod":"POST","responseType":"application/xml","description":"这是描述\n啊打法的","requestArgs":[],"responseArgs":[]},
+                    {"id":"c3","name":"修改角色","url":"http://www.cc.com","requestMethod":"GET","responseType":"application/json","description":"接口说明士大夫撒","requestArgs":[],"responseArgs":[]},
+                    {"id":"c4","name":"查询角色列表","url":"http://www.dd.com","requestMethod":"GET","responseType":"application/json","description":"接口说明士大夫撒","requestArgs":[],"responseArgs":[]}
+                ]},
+                {"id":"f1","name":"菜单管理","children":[
+                    {"id":"c1","name":"添加菜单","url":"http://www.ee.com","requestMethod":"GET","responseType":"application/json","description":"接口说明士大夫撒","requestArgs":[],"responseArgs":[]},
+                    {"id":"c1","name":"删除菜单","url":"http://www.ff.com","requestMethod":"GET","responseType":"application/json","description":"接口说明士大夫撒","requestArgs":[],"responseArgs":[]}
+                ]},
+                {"id":"f1","name":"用户管理"}
+            ]
+        }
+    };
+
+template.helper('jsonFormat', function (obj) {
+    var str = JSON.stringify(obj);
+    return str;
+});
+var currentModule = gdata.modules[0] || {};
+init();
 </script>
 </body>
 </html>

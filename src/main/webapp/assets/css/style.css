@@ -69,8 +69,8 @@ input,textarea{
     padding: 4px 8px;
     box-sizing: border-box;
     outline: none;
-    -webkit-appearance: none;
-     -webkit-border-radius: 0px;
+    /*-webkit-appearance: none;*/
+     -webkit-border-radius: 0;
 }
 .btn{
     padding: 5px 8px;
@@ -496,7 +496,7 @@ section{
     background: #fff;
 }
 .api-module{
-    margin-right: 20px;
+    margin-right: 10px;
     color: #000;
     border-bottom:2px solid #fff;
     padding: 0 8px;
@@ -505,11 +505,12 @@ section{
 .api-module i{
     margin:0 5px;
 }
+.api-module-item i.icon-close,.api-module-item i.icon-bianji{
+    display: none;
+}
 .api-new-module{
-    border: 1px solid #0089cd;
     width: 200px;
     color: #757575;
-    outline: none;
     display: none;
 }
 .api-module-plus i{
@@ -520,6 +521,9 @@ section{
     width: 14px;
     height:14px;
 }
+.api-save,.api-cancel{
+    display: none;
+}
 .api-module:hover{
     color:#0089cd;
 }
@@ -528,6 +532,8 @@ section{
 }
 .api-module span{
     cursor: pointer;
+    display: inline-block;
+    min-width: 20px;
 }
 .apis{
     padding: 40px 0;
@@ -551,6 +557,7 @@ section{
 .apis-nav .api-name{
     padding: 5px 0 5px 20px;
     cursor: pointer;
+    border-left:2px solid #fff;
 }
 .apis-nav .api-name.api-folder-new{
     background: #e0e0e0;
@@ -583,21 +590,22 @@ section{
     padding-left: 35px;
 }
 
-.api-editing i.close{
-    font-family:monospace;
-    width: 20px;
-    height: 20px;
-    text-align: center;
-}
-.api-editing i.close:hover{
-    border-radius: 100%;
-    background: #9e9e9e;
-    color: #fff;
-}
-.api-editing{}
-.api-editing i.close{
+.api-editing .api-module-item i.icon-bianji,.api-editing .api-module-item i.icon-close{
     display: inline-block;
 }
+.api-editing .api-save,.api-editing .api-cancel{
+    display: list-item;
+}
+.api-editing .api-edit{
+    display: none;
+}
+.api-editing #api-view-box{
+    display: none;
+}
+.api-editing #api-edit-box{
+    display: block;
+}
+
 .api-content{
     padding: 0 20px;
     width: 1000px;
@@ -645,6 +653,7 @@ section{
     text-align: right;
     min-height: 15px;
     font-size: 14px;
+    line-height: 34px;
 }
 .api-content .text-value{
     width: 400px;
@@ -672,29 +681,35 @@ section{
 .api-add-sub{
     display: none
 }
-.api-tr-row-2 td{
-    background: #f3f3fb!important;
+.api-tr-row-2 td.td-name{
+    padding-left: 25px;
 }
-.api-tr-row-3 td{
-    background: #f0f0ff!important;
+.api-tr-row-3 td.td-name{
+    padding-left: 40px;
 }
-.api-tr-row-4 td{
-    background: #e7e7ff!important;
+.api-tr-row-4 td.td-name{
+    padding-left: 55px;
 }
-.api-tr-row-5 td{
-    background:#d7d7de!important;
+.api-tr-row-5 td.td-name{
+    padding-left: 70px;
 }
-.api-tr-row-6 td{
-    background:#d5d5de!important;
+.api-tr-row-6 td.td-name{
+    padding-left: 85px;
 }
-.api-tr-row-7 td{
-    background:#c8c8dc!important;
+.api-tr-row-7 td.td-name{
+    padding-left: 100px;
 }
-.api-tr-row-8 td{
-    background:#d4dac3!important;
+.api-tr-row-8 td.td-name{
+    padding-left: 115px;
 }
-.api-tr-row-9 td{
-    background:#efdddb!important;
+.api-tr-row-9 td.td-name{
+    padding-left: 130px;
+}
+.api-tr-row-10 td.td-name{
+    padding-left: 145px;
+}
+.api-tr-row-11 td.td-name{
+    padding-left: 160px;
 }
 
 

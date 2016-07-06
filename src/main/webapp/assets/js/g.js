@@ -76,11 +76,30 @@ $(function(){
     });
 });
 
-var api={};
-api.loading = function(args){
-    if("close" == args){
-        $("#loading").hide();
-    }else{
-        $("#loading").show();
+var api={
+    loading:function(args) {
+        if ("close" == args) {
+            $("#loading").hide();
+        } else {
+            $("#loading").show();
+        }
+    },
+    getJSON:function(data){
+        if(!data){
+            data = {};
+        }
+        if(data instanceof String){
+            try{
+                data = JSON.parse(data);
+            }catch (e){
+                alert("JSON格式有误");
+            }
+        }
+        return data;
+    },
+    text : function(text){
+        if(!text){text="";}
+        text = text.replace(/\n/g,"<br/>").replace(/\s/g,"&nbsp;");
+        return text;
     }
 };
