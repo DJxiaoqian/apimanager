@@ -13,6 +13,32 @@ function stopPropagation(){
 //保存参数
 function saveData(){
     api.loading();
+    var $active = $("#api-edit-nav .active:not(.api-descrition):eq(0)");
+    if($active.length>0){
+        //请求参数
+        var requestArgs=[];
+        var req={},level=1;
+        $("#requestArgTbody tr").each(function(){
+            var args={};
+            $(this).find(".api-field").each(function(){
+                var name = $(this).data("name");
+                var value = $(this).val() || $(this).text();
+                args[name]=value;
+            });
+            /*var currentLevel = parseInt($(this).data("level"));
+            if(currentLevel==1){
+                req=args;
+                requestArgs.push(req);
+                level = 1;
+            }else if(currentLevel>level){
+               if(!req.children){req.children=[]}
+                req.children.push(args);
+            }*/
+        });
+        //响应数据
+        //示例数据
+    }
+
     //新增数据
     //修改数据
     //删除数据
@@ -234,6 +260,8 @@ var editor={
         $dom.next().slideToggle();
     },
     turnRight:function (dom){//打开右侧
+        //先保存之前的数据
+        saveData();
         $("#api-edit-description").hide();
         $("#api-edit-details").show();
         var data= $(dom).parent().data("json");
@@ -241,10 +269,16 @@ var editor={
         data.description = api.text(data.description);
         var html = template('api-edit-details-template',data);
         $("#api-edit-details").html(html);
+        $("#api-edit-nav .active").removeClass("active");
+        $(dom).parent().addClass("active");
     },
     turnRightDoc: function (dom){//打开文档说明
+        //先保存之前的数据
+        saveData();
         $("#api-edit-description").show();
         $("#api-edit-details").hide();
+        $("#api-edit-nav .active").removeClass("active");
+        $(dom).addClass("active");
     },
     requestArgTypeChange:function (dom){//请求参数onchange
         if(dom.value=='array[object]' || dom.value=='object' ){
@@ -256,7 +290,7 @@ var editor={
     requestArgTypeAppend: function(dom){//请求参数类型append
         var $tr = $(dom).parent().parent();
         var level = parseInt($tr.data("level")) || 1;
-        var html= $("#requestArgTemplate").html().replace(/{{level}}/g,++level);
+        var html= $("#requestArgTemplate").html().replace(/@level@/g,++level);
         /* var $next = $tr.next();
          while ($next.length>0 && parseInt($next.data("level")) == level){
          $tr= $next;
@@ -267,7 +301,7 @@ var editor={
     responseArgTypeAppend:function (dom){//响应参数类型append
         var $tr = $(dom).parent().parent();
         var level = $tr.data("level") || 1;
-        var html= $("#responseArgTemplate").html().replace(/{{level}}/g,++level);
+        var html= $("#responseArgTemplate").html().replace(/@level@/g,++level);
         $tr.after(html);
     },
     removeRow:function (dom){//移除当前行
