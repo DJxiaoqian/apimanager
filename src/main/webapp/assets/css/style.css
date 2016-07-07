@@ -712,7 +712,9 @@ section{
     padding-left: 160px;
 }
 
-
+#api-result{
+    background-color: #efefef;
+}
 
 
 

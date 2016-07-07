@@ -13,7 +13,7 @@ $.fn.reset= function(){
     $(this).find(':input').each(
         function(){
             switch(this.type){
-                case 'passsword':
+                case 'password':
                 //case 'select-multiple':
                 //case 'select-one':
                 case 'text':
@@ -34,6 +34,20 @@ $.fn.modal = function(){
     //$(this).find(".container").css("margin-top",$(document).scrollTop()+150);
     $(".modal-layer").fadeIn();
     $("body").addClass("modal-open");
+};
+
+$.fn.setValue = function(value){
+    switch(this[0].constructor.name){
+        case 'HTMLInputElement':
+        case 'HTMLSelectElement':
+        case 'HTMLTextAreaElement':
+            this.val(value);
+            this.attr("data-value",value);
+            break;
+        default:
+            this.text(value);
+            break
+    }
 };
 
 $(function(){

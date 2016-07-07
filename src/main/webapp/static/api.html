@@ -5,16 +5,11 @@
     <title>小幺鸡API可视化管理系统</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="http://at.alicdn.com/t/font_1467729261_0034997.css">
-    <link href="../assets/umeditor/themes/default/css/umeditor.css" type="text/css" rel="stylesheet">
-    <!--<link rel="stylesheet" href="../assets/css/ali/iconfont.css">-->
-    <link rel="dns-prefetch" href="http://cdn-img.easyicon.net">
-    <link rel="dns-prefetch" href="http://download.easyicon.net">
     <meta name="keywords" content="" />
     <meta name="description" content="" />
-    <script src="../assets/js/jquery.min.js"></script>
-    <script src="../assets/js/g.js"></script>
+
 </head>
-<body class="api-body api-editing">
+<body class="api-body">
 <header>
     <div class="top">
         <div class="lading" id="loading"></div>
@@ -181,7 +176,7 @@
             <th width="15%">类型</th>
             <th>描述</th>
         </tr></thead>
-        <tbody id="requestArgTbody"></tbody>
+        <tbody id="requestArgTbody">{{#requestArgsBody}}</tbody>
     </table>
     <div class="form-text">
         <button class="btn btn-primary" onclick="$('#requestArgTbody').append($('#requestArgTemplate').html().replace(/@level@/g,1))"><i class="iconfont icon-tianjia"></i>添加参数</button>
@@ -195,7 +190,7 @@
             <th width="15%">类型</th>
             <th>描述</th>
         </tr></thead>
-        <tbody id="responseArgTbody"></tbody>
+        <tbody id="responseArgTbody">{{#responseArgsBody}}</tbody>
     </table>
     <div class="form-text">
         <button class="btn btn-primary" onclick="$('#responseArgTbody').append($('#responseArgTemplate').html().replace(/@level@/g,1))"><i class="iconfont icon-tianjia"></i>添加参数</button>
@@ -361,9 +356,9 @@
         </div>
     </form>
     {{/if}}
-    {{if resultData}}
+    {{if apiresult}}
     <p class="api-details-title">结果数据</p>
-    <pre>{{resultData}}</pre>
+    <div id="api-result">{{apiresult}}</div>
     {{/if}}
 </script>
             <div id="api-details" class="api-details"></div>
@@ -431,19 +426,26 @@
 
 </div>
 
-
+<script src="../assets/js/jquery.min.js"></script>
+<script src="../assets/js/g.js"></script>
 <script src="../assets/js/api.js"></script>
 <script src="../assets/arttemplate/template.js"></script>
-<script type="text/javascript" charset="utf-8" src="../assets/umeditor/umeditor.config.js"></script>
-<script type="text/javascript" charset="utf-8" src="../assets/umeditor/umeditor.min.js"></script>
-<script type="text/javascript" src="../assets/umeditor/lang/zh-cn/zh-cn.js"></script>
+<link href="../assets/umeditor/themes/default/css/umeditor.css" type="text/css" rel="stylesheet">
+<script charset="utf-8" src="../assets/umeditor/umeditor.config.js"></script>
+<script charset="utf-8" src="../assets/umeditor/umeditor.min.js"></script>
+<script src="../assets/umeditor/lang/zh-cn/zh-cn.js"></script>
+
+<link href="../assets/jsonformat/jsonFormater.css" type="text/css" rel="stylesheet">
+<script src="../assets/jsonformat/jsonFormater.js"></script>
+
+
 <footer class="ta-c">
     apidoc@2016
 </footer>
 <script>
     var um = UM.getEditor('myEditor');
     var gdata={
-        result:{"c1":"俺的沙发大"},
+        result:{},
         modules:[{"id":"m1","name":"后台管理系统","description":"我擦擦都擦擦撒发射点发射点\nadfad啊多发点","host":"http://www.qq.com","lastupdatetime":"2016-02-02"},
             {"id":"m2","name":"微信端","description":"微信端的简介"},{"id":"m3","name":"APP"}],
         apis:{
@@ -452,9 +454,9 @@
                     {"id":"c1","name":"添加角色","lastupdatetime":"2016/2/1","url":"http://www.qq.com","requestMethod":"GET","responseType":"application/json","description":"接口说明士大夫撒",
                         "example":"{sdfadfa}",
                         "requestArgs":[
-                            {"name":"name","require":"true","defaultValue":"","type":"string","description":"是短发接口和咖啡","children":[
-                                {"name":"name","require":"true","defaultValue":"","type":"string","description":"是短发接口和咖啡"},
-                                {"name":"name","require":"true","defaultValue":"","type":"string","description":"是短发接口和咖啡"}
+                            {"name":"name1","require":"false","defaultValue":"b","type":"object","description":"是短发接口和咖啡","children":[
+                                {"name":"name2","require":"true","defaultValue":"","type":"string","description":"是短发接口和咖啡"},
+                                {"name":"name3","require":"true","defaultValue":"","type":"string","description":"是短发接口和咖啡"}
                             ]}
                         ],"responseArgs":[
                             {"name":"code","type":"number","description":"-1,0"},
@@ -492,7 +494,7 @@
         }
     };
     //新数据
-    var newdata=gdata;
+    //var newdata=gdata;
 
 template.helper('jsonFormat', function (obj) {
     var str = JSON.stringify(obj);

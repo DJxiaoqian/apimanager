@@ -121,11 +121,12 @@ var module={
         $li.remove();
         var id = $li.data("id");
         var deleteIndex;
-        newdata.modules.forEach(function(d,i){
+        //newdata.modules.forEach(function(d,i){
+        gdata.modules.forEach(function(d,i){
             if(d.id = id){deleteIndex=i;return true;}
         });
-        newdata.modules.splice(i,1);
-        newdata.apis[id]=null;
+        gdata.modules.splice(i,1);
+        gdata.apis[id]=null;
     },
     edit:function(dom){
         var $span=$(dom).prev().prev();
@@ -137,7 +138,8 @@ var module={
         var id = $(dom).parent().data("id");
         //修改名称
         currentModule.name=$(this).text();
-        newdata.modules.forEach(function (e) {
+        //newdata.modules.forEach(function (e) {
+        gdata.modules.forEach(function (e) {
             if(e.id == id){
                 d.name=currentModule.name;
             }
@@ -155,9 +157,10 @@ var module={
 
         $("#api-modules li.active").removeClass("active");
         $li.addClass("active");
-        for(var i in newdata.modules){
-            if(newdata.modules[i].id==id){
-                currentModule = newdata.modules[i];
+        //for(var i in newdata.modules){
+        for(var i in gdata.modules){
+            if(gdata.modules[i].id==id){
+                currentModule = gdata.modules[i];
                 break;
             }
         }
@@ -176,8 +179,13 @@ var module={
         $("body").addClass("api-editing");
     },
     saveClick:function(dom){
-        $("body").removeClass("api-editing");
+        //先保存数据
         saveData();
+        //
+        var modules = gdata.modules;
+        var apis = gdata.apis;
+        console.log(modules,apis)
+        $("body").removeClass("api-editing");
     },
     saveModule:function(){///保存模块
         var data =[];
@@ -194,16 +202,17 @@ var module={
         });
         //var id=$("#api-modules .api-module-item.active").data("id");
         var id=currentModule.id;
-        for(var i in newdata.modules){
-            var d= newdata.modules[i];
+        //for(var i in newdata.modules){
+        for(var i in gdata.modules){
+            var d= gdata.modules[i];
             if(d.id == currentModule.id){
                 d.host=$("#api-host").val();
                 d.description=um.getContent();
-                newdata.modules[i]=d;
+                gdata.modules[i]=d;
                 break;
             }
         }
-        newdata.apis[currentModule.id]=data;
+        gdata.apis[currentModule.id]=data;
     }
 };
 //
@@ -287,7 +296,7 @@ var apis={
 
                 data.requestArgsBody=requestArgsBody;
                 data.responseArgsBody=responseArgsBody;
-                data.resultData=gdata.result[data.id];
+                data.apiresult=gdata.result[data.id];
                 var html=template('api-view-details-template',data);
                 $("#api-details").show().html(html);
             });
@@ -308,13 +317,17 @@ var apis={
                 }
             });
         }
+        window.jf.doFormat(JSON.stringify(gdata));
+        gdata.result[currentModule.id]=$("#api-result").html();
+        window.jf.bindEvent();
         return false;
     }
 };
 var editor={
     apis:{
         render:function(){
-            var html = template('api-edit-nav-template',{list:newdata.apis[currentModule.id]});
+            //var html = template('api-edit-nav-template',{list:newdata.apis[currentModule.id]});
+            var html = template('api-edit-nav-template',{list:gdata.apis[currentModule.id]});
             $("#api-edit-nav").html(html);
             //默认显示文档简介
             $("#api-edit-description").show();
@@ -351,25 +364,63 @@ var editor={
         $dom.toggleClass("open");
         $dom.next().slideToggle();
     },
-    turnRight:function (dom){//打开右侧
+    turnRight:function (dom){
         //先保存之前的数据
         saveData();
+        //打开右侧
         $("#api-edit-description").hide();
         $("#api-edit-details").show();
         var data= $(dom).parent().data("json");
         data =api.getJSON(data);
         data.description = api.text(data.description);
-        //todo 填充表格参数
-        
+        data.requestArgsBody="";
+        data.responseArgsBody="";
+        function gethtml(d,i,template,obj){
+            var $tr = $(template.replace(/@level@/g,i));
+            $tr.find(".api-field").each(function(){
+                $(this).setValue(d[$(this).data("name")])
+            });
+            data[obj] += $tr.prop('outerHTML');
+            if(d.children && d.children.length>0){
+                d.children.forEach(function(temp){
+                    var index = i;
+                    gethtml(temp,++index,template,obj);
+                });
+            }
+        }
+        if(data.requestArgs && data.requestArgs.length>0){
+            data.requestArgs.forEach(function(d){
+                gethtml(d,1,$("#requestArgTemplate").html(),"requestArgsBody");
+            });
+        }
+        if(data.responseArgs && data.responseArgs.length>0){
+            data.responseArgs.forEach(function(d){
+                gethtml(d,1,$("#responseArgTemplate").html(),"responseArgsBody");
+            });
+        }
         var html = template('api-edit-details-template',data);
+        //填充内容
         $("#api-edit-details").html(html);
+
+        $("#api-edit-details select").each(function(){
+            var value = $(this).data("value");
+            if(value != undefined){
+                //显示加号
+                if(value =="object" || value=="array[object]"){
+                    $(this).parents("tr").find(".icon-tianjia").show();
+                }
+                //设置select值
+                $(this).val(value.toString());
+            }
+        });
+        //标识当前项
         $("#api-edit-nav .active").removeClass("active");
         $(dom).parent().addClass("active");
     },
     turnRightDoc: function (dom){
-        //打开文档说明
         //先保存之前的数据
         saveData();
+        //打开文档说明
         $("#api-edit-description").show();
         $("#api-edit-details").hide();
         $("#api-edit-nav .active").removeClass("active");
@@ -386,11 +437,6 @@ var editor={
         var $tr = $(dom).parent().parent();
         var level = parseInt($tr.data("level")) || 1;
         var html= $("#requestArgTemplate").html().replace(/@level@/g,++level);
-        /* var $next = $tr.next();
-         while ($next.length>0 && parseInt($next.data("level")) == level){
-         $tr= $next;
-         $next = $next.next();
-         }*/
         $tr.after(html);
     },
     responseArgTypeAppend:function (dom){//响应参数类型append
@@ -441,8 +487,17 @@ function init(){
         }
         if(isNew){
             currentModule={id:id,name:$(this).text()}
-            newdata.modules.push(currentModule);
+            //newdata.modules.push(currentModule);
+            gdata.modules.push(currentModule);
         }
     });
-
+    //jsonformat
+    (function(){
+        var options = {
+            dom : '#api-result', //对应容器的css选择器
+            imgCollapsed:'../assets/jsonformat/images/Collapsed.gif',
+            imgExpanded:'../assets/jsonformat/images/Expanded.gif'
+        };
+        window.jf = new JsonFormater(options); //创建对象
+    })();
 }
