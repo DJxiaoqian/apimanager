@@ -88,7 +88,7 @@ var api={
         if(!data){
             data = {};
         }
-        if(data instanceof String){
+        if(data.constructor.name=="String"){
             try{
                 data = JSON.parse(data);
             }catch (e){

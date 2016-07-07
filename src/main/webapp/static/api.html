@@ -129,7 +129,7 @@
     <li data-id="{{$value.id}}">
         <div class="api-name api-folder open">
             <i onclick="editor.folderToggleSlide(this)" class="icon-angeldownblock iconfont"></i>
-            <span contenteditable="true">文件夹名称</span>
+            <span contenteditable="true">{{$value.name}}</span>
             <i onclick="editor.apiDelete(this)" class="icon-close iconfont"></i>
             <i onclick="editor.apiEdit(this)" class="icon-bianji iconfont api-new"></i>
             <i onclick="editor.newApi(this)" class="icon-tianjia iconfont api-new"></i>
@@ -157,8 +157,10 @@
         </div>
         <div class="api-content fl">
             <div id="api-edit-description" class="api-doc-desc">
+                <p class="api-details-title">接口地址域名</p>
+                <div class="form-text"><input type="text" id="api-host" class="text" placeholder="接口地址域名如：http://example.com/a/b/c  则host为[http://example.com]"/></div>
                 <div class="apis-module-name">接口说明</div>
-                <script type="text/plain" id="myEditor" style="width:900px;height:500px;"><p>在这里可以记录一些模块注意说明等</p></script>
+                <script type="text/plain" id="myEditor" style="width:960px;height:500px;"><p>在这里可以记录一些模块注意说明等</p></script>
             </div>
 <script type="text/html" id="api-edit-details-template">
     <p class="api-details-title">基本信息</p>
@@ -442,7 +444,7 @@
     var um = UM.getEditor('myEditor');
     var gdata={
         result:{"c1":"俺的沙发大"},
-        modules:[{"id":"m1","name":"后台管理系统","description":"我擦擦都擦擦撒发射点发射点\nadfad啊多发点","lastupdatetime":"2016-02-02"},
+        modules:[{"id":"m1","name":"后台管理系统","description":"我擦擦都擦擦撒发射点发射点\nadfad啊多发点","host":"http://www.qq.com","lastupdatetime":"2016-02-02"},
             {"id":"m2","name":"微信端","description":"微信端的简介"},{"id":"m3","name":"APP"}],
         apis:{
             "m1":[
@@ -489,6 +491,8 @@
             ]
         }
     };
+    //新数据
+    var newdata=gdata;
 
 template.helper('jsonFormat', function (obj) {
     var str = JSON.stringify(obj);
