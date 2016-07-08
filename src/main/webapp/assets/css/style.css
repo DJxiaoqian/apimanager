@@ -714,6 +714,8 @@ section{
 
 #api-result{
     background-color: #efefef;
+    max-height: 600px;
+    overflow-y: auto;
 }
 
 

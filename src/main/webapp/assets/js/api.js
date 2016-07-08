@@ -86,9 +86,6 @@ function saveData(){
         $active.data("json",json);
     }
 
-    //新增数据
-    //修改数据
-    //删除数据
     api.loading("close");
 }
 //添加
@@ -117,16 +114,42 @@ $(".api-add-modal-ok").click(function(){
 
 var module={
     remove:function(dom){
+        //删除module
         var $li = $(dom).parent();
-        $li.remove();
         var id = $li.data("id");
+        //
         var deleteIndex;
-        //newdata.modules.forEach(function(d,i){
-        gdata.modules.forEach(function(d,i){
-            if(d.id = id){deleteIndex=i;return true;}
-        });
-        gdata.modules.splice(i,1);
+        for(var i in gdata.modules){
+            var d = gdata.modules[i];
+            if(d.id == id){deleteIndex=i;break;}
+        }
+
+        //删除对应module数据
+        if(deleteIndex){
+            gdata.modules.splice(deleteIndex,1);
+        }
+        //删除对应api数据
         gdata.apis[id]=null;
+        delete gdata.apis[id];
+        var isActive=$li.hasClass("active");
+        $li.remove();
+        if(isActive){
+            //设置默认显示
+            if(gdata.modules.length>0){
+                 currentModule = gdata.modules[0];
+                $("#api-modules .api-module-item:eq(0)").addClass("active");
+                editor.apis.render();
+            }else{
+                currentModule=null;
+                //移除左侧导航条
+                $("#api-edit-nav .api-folder").each(function(){
+                    $(this).parent().remove();
+                });
+                //清空host和content
+                $("#api-host").val("");
+                um.setContent("");
+            }
+        }
     },
     edit:function(dom){
         var $span=$(dom).prev().prev();
@@ -145,6 +168,9 @@ var module={
             }
         });
     },
+    isEditing:function(){
+        return $("body").hasClass("api-editing");
+    },
     txtOnClick:function(dom){
         var temp=$(dom).attr("contenteditable");
         if(temp){return;}
@@ -152,7 +178,10 @@ var module={
         if($li.hasClass("active")){
             return;
         }
-        this.saveModule();
+        var isEditing = this.isEditing();
+        if(isEditing && currentModule){
+            this.saveModule();
+        }
         var id = $li.data("id");
 
         $("#api-modules li.active").removeClass("active");
@@ -164,7 +193,6 @@ var module={
                 break;
             }
         }
-        var isEditing = $("body").hasClass("api-editing");
         if(isEditing){
             editor.apis.render();
         }else{
@@ -176,16 +204,22 @@ var module={
         $("#api-modules").html(html);
     },
     editClick:function(dom){
+        currentModule = gdata.modules[0];
+        $(".api-module-item.active").removeClass("active");
+        $(".api-module-item:eq(0)").addClass("active");
         $("body").addClass("api-editing");
     },
     saveClick:function(dom){
-        //先保存数据
-        saveData();
+        if(currentModule) {
+            //先保存数据
+            saveData();
+            this.saveModule();
+        }
         //
-        var modules = gdata.modules;
-        var apis = gdata.apis;
-        console.log(modules,apis)
+        var modulesData = gdata.modules;
+        var apisData = gdata.apis;
         $("body").removeClass("api-editing");
+        apis.render();
     },
     saveModule:function(){///保存模块
         var data =[];
@@ -202,7 +236,6 @@ var module={
         });
         //var id=$("#api-modules .api-module-item.active").data("id");
         var id=currentModule.id;
-        //for(var i in newdata.modules){
         for(var i in gdata.modules){
             var d= gdata.modules[i];
             if(d.id == currentModule.id){
@@ -239,6 +272,8 @@ var apis={
             //文档
             $("#api-view-box .api-description").off("click").on("click",function(){
                 $("#api-doc-desc").show().html(api.text(currentModule.description));
+                $("#api-view-box .api-name.active").removeClass("active");
+                $(this).addClass("active");
                 $("#api-details").hide();
             });
             //接口点击
@@ -293,12 +328,14 @@ var apis={
                         temp(d,1);
                     });
                 }
-
                 data.requestArgsBody=requestArgsBody;
                 data.responseArgsBody=responseArgsBody;
                 data.apiresult=gdata.result[data.id];
                 var html=template('api-view-details-template',data);
                 $("#api-details").show().html(html);
+                if(data.apiresult){
+                    window.jf.bindEvent();
+                }
             });
         }
     },
@@ -313,12 +350,13 @@ var apis={
                 complete:function(){
                     api.loading("close");
                 },success:function(rs){
-                    gdata.result[id] = rs;
+                    //gdata.result[id] = rs;
+                    window.jf.doFormat(JSON.stringify(rs));
                 }
             });
         }
         window.jf.doFormat(JSON.stringify(gdata));
-        gdata.result[currentModule.id]=$("#api-result").html();
+        gdata.result[id]=$("#api-result").html();
         window.jf.bindEvent();
         return false;
     }
@@ -482,7 +520,7 @@ function init(){
         var id = $li.data("id"),isNew;
         if(!id){
             isNew=true;
-            id="new_"+$("#api-modules .api-module-item").length-1;
+            id="new_"+($("#api-modules .api-module-item").length-1);
             $li.data("id",id);
         }
         if(isNew){
