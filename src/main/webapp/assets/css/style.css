@@ -191,23 +191,44 @@ body.modal-open{
 }
 
 #loading{
-    position: absolute;
+    position: fixed;
     left: 0;
-    top:0;
-    z-index: 2;
-    margin-top: 5px;
+    bottom: 0;
+    z-index: 3000;
     display: none;
+    height: 2px;
+    width: 100%;
+    background: #fff;
 }
-.lading{
-    width: 20px;
-    height: 20px;
-    border: 1px #fff solid;
+#loading-sub{
+    height: 100%;
+    width: 0;
+    background: darkblue;
+}
+#loading.show{
+    display: block;
+}
+#loading.show #loading-sub{
+    -webkit-transition: width 4s;
+    -moz-transition: width 4s;
+    -ms-transition: width 4s;
+    -o-transition: width 4s;
+    transition: width 4s;
+}
+.loading{
+    width: 14px;
+    height: 14px;
+    border: 1px #000 solid;
     border-radius: 50%;
+    position: fixed;
+    z-index:3001;
+    bottom: 0;
+    right:0;
     -webkit-animation: rotation 1s ease-in-out infinite;
     -moz-animation: rotation 1s ease-in-out infinite;
     animation: rotation 1s ease-in-out infinite;
 }
-.lading:after{
+.loading:after{
     width: 5px;
     height: 5px;
     background-color: rgba(255,255,255,1);

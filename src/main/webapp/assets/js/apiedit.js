@@ -117,8 +117,12 @@ var module={
         //删除module
         var $li = $(dom).parent();
         var id = $li.data("id");
-        //
-        var deleteIndex;
+        if(!confirm("是否确认删除?")){
+            return false;
+        }
+        $.ajax();
+        location.reload();
+        /*var deleteIndex;
         for(var i in gdata.modules){
             var d = gdata.modules[i];
             if(d.id == id){deleteIndex=i;break;}
@@ -149,7 +153,7 @@ var module={
                 $("#api-host").val("");
                 um.setContent("");
             }
-        }
+        }*/
     },
     edit:function(dom){
         var $span=$(dom).prev().prev();
@@ -160,13 +164,15 @@ var module={
         $(dom).removeAttr("contenteditable");
         var id = $(dom).parent().data("id");
         //修改名称
-        currentModule.name=$(this).text();
+        var newName = $(dom).text();
+        $.post("",{id:id,name:newName});
+        //currentModule.name=;
         //newdata.modules.forEach(function (e) {
-        gdata.modules.forEach(function (e) {
+        /*gdata.modules.forEach(function (e) {
             if(e.id == id){
                 e.name=currentModule.name;
             }
-        });
+        });*/
     },
     isEditing:function(){
         return $("body").hasClass("api-editing");
@@ -246,6 +252,11 @@ var module={
             }
         }
         gdata.apis[currentModule.id]=data;
+    },
+    createModule:function(txt,$dom){
+        $.post("",{name:txt},function(data){
+            $dom.data("id",data);
+        });
     }
 };
 //
@@ -495,10 +506,12 @@ var editor={
         $tr.remove();
     }
 };
+
+
 //初始化
 function init(){
     module.render();
-    apis.render();
+    //apis.render();
     editor.apis.render();
 
     //模块-新增
@@ -515,7 +528,8 @@ function init(){
         $(this).hide();
         var html  =$("#api-module-template").html().replace(/\{\{name}}/g,text);
         $(this).before(html);
-
+        module.createModule(text,$(this));
+        /*
         var $li = $(this).parent();
         var id = $li.data("id"),isNew;
         if(!id){
@@ -525,9 +539,8 @@ function init(){
         }
         if(isNew){
             currentModule={id:id,name:$(this).text()}
-            //newdata.modules.push(currentModule);
             gdata.modules.push(currentModule);
-        }
+        }*/
     });
     //jsonformat
     (function(){

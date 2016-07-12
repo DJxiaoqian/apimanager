@@ -93,9 +93,13 @@ $(function(){
 var api={
     loading:function(args) {
         if ("close" == args) {
-            $("#loading").hide();
+            $("#loading").removeClass("show");
+            $("#loading-sub").css("width","0");
         } else {
-            $("#loading").show();
+            $("#loading").addClass("show");
+            setTimeout(function(){
+                $("#loading-sub").css("width","98%");
+            },100);
         }
     },
     getJSON:function(data){
@@ -117,3 +121,31 @@ var api={
         return text;
     }
 };
+
+$._ajax_=$.ajax;
+$.ajax = function(options){
+    options = options || {};
+    var complete = options.complete;
+    var success = options.success;
+    options.complete = function(){
+        api.loading("close");
+        if(complete){
+            complete.apply(this,arguments);
+        }
+    };
+    options.success = function(){
+        if(success){
+            success.apply(this,arguments);
+        }
+    };
+    api.loading();
+    $._ajax_(options);
+};
+$.post = function(url,data,fn,type){
+    $.ajax({url:url,type:"post",dataType:type,success:fn});
+};
+$.get = function(url,data,fn,type){
+    $.ajax({url:url,type:"get",dataType:type,success:fn});
+};
+
+
